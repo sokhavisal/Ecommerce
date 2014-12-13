@@ -6,7 +6,8 @@ and open the template in the editor.
 -->
 <?php
 include ("func_Category.php");
-
+include ("page_DisplayProduct.php");
+include ("page_DetailProduct.php");
 ?>
 <html>
     <head>
@@ -14,6 +15,7 @@ include ("func_Category.php");
 	<link rel="stylesheet" type="text/css" href="css/css.css">
 	<script src="js/js.js"></script>
 	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/DetailPro.css">
 	<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
 	<script src="js/script.js"></script>
         <title>Mywebsite</title>
@@ -27,19 +29,20 @@ include ("func_Category.php");
 		    <img  src="logo/logo.gif" width="300px" height="50px">
 		</div>
 		<ul>
-		    <li><a href="#">Home</a>
-		    <li><a href="#">About us</a>
-		    <li><a href="#">Contact</a>
+		    <li><img src="img/home.png" width="50px" height="50px" ><a href="index.php">Home</a></li>
+		  
+		    <li><img src="img/bookmark.png" width="50px" height="50px" ><a href="?page=AboutUS">About us</a></li>
+		    <li><img src="img/box.png" width="50px" height="50px" ><a href="?page=Contact">Contact</a></li>
 			
 		</ul>
 	    </div>
-	  	
-	    <div id="search">
+
+	    <form id="search" name="searchPro" method="Post" action="i.php">
 		<div id="search-box">
 		    <input id="txtSearch" type="textbox" name="txtsearch"  placeholder="search Product..." width="80px" height="30px" >
 		    <input id="btnsearch" type="button" value="Search" >   
 		</div>
-	    </div>
+	    </form>
 	    
 	</div>
 	<div style="clear: both;"></div>	
@@ -74,7 +77,6 @@ include ("func_Category.php");
 			 <li class='last'><a href='#'><span>Contact</span></a></li>
 		      </ul>
 		   </li>
-<!--		   ///<li class='last'><a href='#'><span>Contact</span></a></li>-->
 		</ul>
 	    </div> <!--- End of Accesory Category Item. -->
 	    
@@ -84,172 +86,40 @@ include ("func_Category.php");
 	
     
 	<div id ="content">
-	    <div id="home">
-		<div id="Wrap-Privousbtn">
-		    <input id="btnNext" type="button" value="Next" >
-		    <input id="btnPrivous" type="button" value="Privous" >
-		</div>
-	    </div>
-	    <div id="Pro-header">
-		<p id="Pro-title">Product Title</p>
-	    </div>
-	   <div id="Pro-show"> <!-- Box for show Item. -->
-	       
-	       
-		<div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-	       
-	       
-	       
-	       <div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-	       
-	       
-	       
-	       <div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-	       
-	       
-	       
-	       <div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-	       <div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-	       
-	       
-	       
-	       <div Class="Pro-Box"> <!-- Box for Item. -->
-		    <div class="imagBox"><!-- Box for Image. -->
-			
-			<img src="img/golf.jpg" width="190px" height="170px" >
-			
-		    </div><!-- End of Image. -->
-		   
-		    
-		    <div class="ImagBox-Dec"><!-- Box for Image Description. -->
-			<p> Model: 1201-aaa199</p>
-			<p>color: blue.</p>
-			<p>years: 2012.</p>
-			<p> Price: 120000$</p>
-			
-			
-		    </div><!-- End of Box for Image Description. -->
-		    
-		    <div class="Pro-btnView"><!-- Box for for Button View. -->
-			
-			<input class="mybtn" name="btnview" type="button" value="View Detail">
-		    </div><!-- End of Box for Button View. -->
-		</div>
-		<div style="clear: both;"></div>	
 	    
-		</div> <!-- End of Box for Item. -->
-	<div class="Pro-Privouse">
-	    <div id="Wrap-Privousbtn">
-		 <input id="btnNext" type="button" value="Next" >
-		 <input id="btnPrivous" type="button" value="Privous" >
+	    <div id="banner">
+		<img src="img/banner.jpg" width="990px" height="400px">
 	    </div>
-	</div>
+    <!-- ************************** block Display Product *********************** -->
+    
+    
+     <?php 
+	if(isset($_GET['page'])){
+	   //  echo $hmtlDisplayPro; 
+	    switch ($_GET['page']) {
+		case 'Contact':
+		    echo $_GET['page'] ;
+		    break;
+		 case 'search':
+		  echo $hmtlDisplayPro;   
+		    break;   
+		default:
+		    echo $hmtlDisplayPro;   
+		    break;
+	    } 
 		
+	}else {
+	   echo $hmtlDisplayPro;  
+	}
+     ?>
+    
+    
+    <!-- ************************** End Display Product ************************* -->
+    
+	    
+	    
+	    
+	    
 	<div id="Otherllogo"><!-- start block for Sponsor -->
 	       <div id="Otherllogo-header">
 		   <h3> Other Sponsor</h3>
