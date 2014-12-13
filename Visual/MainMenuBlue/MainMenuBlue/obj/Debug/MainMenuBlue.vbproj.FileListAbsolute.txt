@@ -1,0 +1,14 @@
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\bin\Debug\MainMenuBlue.exe.config
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\bin\Debug\MainMenuBlue.exe
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\bin\Debug\MainMenuBlue.pdb
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\bin\Debug\MainMenuBlue.xml
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.Resources.resources
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.vbproj.GenerateResource.Cache
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.exe
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.xml
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.pdb
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.frmMainMenuBlue.resources
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.frmInventory.resources
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.frmInventoryEn.resources
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.Form1.resources
+C:\Users\User\Dropbox\C# Program\MainMenuBlue\MainMenuBlue\obj\Debug\MainMenuBlue.Form2.resources
