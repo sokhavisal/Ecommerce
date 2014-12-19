@@ -38,11 +38,11 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     height: 50px;
     background-color:#FFF;
     float:left;
-    margin:15px;
+    margin:25px;
 }
 #search
 {
-    width: 500px;
+    width: 480px;
     height: 100px;
     //background-color:#DDD;
     float: right;
@@ -53,7 +53,7 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     height: 60px;
    //  background-color:#FFF;
      float: left;
-     margin: 20px 0 0 70px;
+     margin: 25px 0 0 70px;
 }
 #txtSearch{
      padding: 13px ;
@@ -82,7 +82,7 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
 }
 #nav ul li{
     display: inline-block;
-    //border: 2px solid #DDD;
+ 
 }
 #nav ul li:hover{
     background-color: #c0d6e4;
@@ -93,9 +93,8 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
 }
 #nav ul li a,visited{
     display: block;
-    padding: 15px;
-    color:black;
-    
+    padding: 10px;
+    color:#0099cc;
     text-decoration: none;
     font-size: 18px;
 }
@@ -118,8 +117,15 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
    // background-color:#e5e5e5;
     padding: 10px ;
    // margin: 5px 5px 5px 5px;
-    margin: 85px 0 0 0;
+    margin: 120px 0 0 0;
     float: left;
+    
+}
+#banner{
+    width:990px;
+    height: 400px;
+    margin: 5px  0 5px ;
+    background-color: #DDD;
     
 }
 #leftside{
@@ -130,7 +136,7 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     padding: 15px ;
     margin: 5px 5px 5px 5px;
     float: left; 
-    margin: 82px 0 0 0;
+    margin: 120px 0 0 0;
     height: 0 auto;
     
 }
@@ -165,7 +171,7 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     //text-align: left;
 }
 #footerMenu{
-   border: 2px solid #DDD;
+   border: 1px solid #DDD;
     width: 100%;
     //background-color:red;
    
@@ -182,19 +188,34 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     font-size: 13px;
 }
 
-#Pro-show{
+.Pro-show{
     width: 990px;
     height: auto ;
     background-color:#FFF;
     border: 1px solid #DDD;
    
 }
+#Box-Detail{
+    width: 700px;
+    height: auto;
+      background-color: #FFF;
+    float: right;
+    margin: 20px;
+     border: 1px solid #DDD;
+}
+#Box-Detailheader{
+     width: 700px;
+    height:50px;
+    background-color: red;
+  
+}
+
 #Pro-title{
     padding:  15px;
     font-size: 19px;
     color:#FFF;
 }
-#Pro-header{
+.Pro-header{
     width: 990px;
     height: 50px;
     background-color: #75bdd1;
@@ -202,6 +223,12 @@ box-shadow: -1px 4px 5px -1px rgba(0,0,0,0.75);
     -moz-border-radius: 8px 8px 8px 8px;
     -webkit-border-radius: 8px 8px 8px 8px;
     border: 0px solid #000000;
+}
+#Pro-Detail{
+    width: 990px;
+    height: auto ;
+    background-color:#FFF;
+    border: 1px solid #DDD;
 }
 #home{
     width: 990px;
