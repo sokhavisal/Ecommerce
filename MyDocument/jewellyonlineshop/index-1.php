@@ -45,7 +45,7 @@ else
 
 
 <!-- Main Div Tag Start-->
-<div id="wrapper">
+<div id="wrapper" >
 
 
 	<!-- Header Part Start-->
@@ -69,7 +69,7 @@ else
 
 		<!--Random Featured Product Start-->
 		<div class="box mb0" id="randomfeatured">
-		<div class="box-heading-1"><span>Random Featured</span></div>
+		<div class="box-heading-1"><span style="color:#0099cc ">Random Featured</span></div>
 			<div class="box-content-1">
 				<div class="box-product-1" >
 					<?php
@@ -83,7 +83,7 @@ else
 
 		<!--Special Promo Banner Start-->
 		<div class="box-promo" id="box-promo">
-			<div class="box-heading-1"><span>PROMO ON FEATURED ITEMS</span></div>
+			<div class="box-heading-1"><span style="color:#0099cc ">PROMO ON FEATURED ITEMS</span></div>
 			<div id="banner0" class="banner">
 				<div style="display:block;"><img src="image/addBanner-940x145.jpg" alt="Special Offers" title="Special Offers" /></div>
 			</div>
@@ -92,7 +92,7 @@ else
 
 		<!--Coming Soon Product Start-->
 		<div class="box-heading-1" id="soon">
-			<div class="box-heading-1"><span>Coming Soon</span></div>
+			<div class="box-heading-1" style="color:#0099cc "><span style="color:#0099cc ">Coming Soon</span></div>
 				<div id="carousel0">
 					<ul class="jcarousel-skin-opencart">
 		<!--Coming Soon Product End-->
@@ -119,10 +119,20 @@ else
 	<!--Flexslider Javascript Part End-->
  
  
-<?php
-	$end = microtime(true);
-	$elapsed = $end - $start;
-	echo "Procedure 1 = {$elapsed} seconds";
-?>
+//<?php
+//	$end = microtime(true);
+//	$elapsed = $end - $start;
+//	echo "Procedure 1 = {$elapsed} seconds";
+//?>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>	
+
 </body>
+
 </html>

@@ -60,7 +60,7 @@ else
 	
 			<!--View Product Start-->
 			<div class="box mb0">
-				<div class="box-heading-1"><span>Items</span></div>
+				<div class="box-heading-1"><span style="color:#0099cc ">Items</span></div>
 				<div class="box-content-1">
 					<div class="box-product-1" >
 						<?php
@@ -171,7 +171,7 @@ else
 								 <div class="image"><a href="' . $src . $path . '"><img width="' . $width . '" height="' . $height . '" src="' . $src . $path . '" alt = "' . $prodname . '"></a></div>';
 								 $list .='
 								   <div class="proName">
-									<div class="name"><a href="' . $src . $path . '">' . $desc . '</a></div>
+									<div class="name"><a   href="' . $src . $path . '">' . $desc . '</a></div>
 									<div class="price">' . $price . '</div>
 									<div class="cart">
 										<label class="btn">';
@@ -205,7 +205,7 @@ else
 								 <div class="image"><a href="' . $src . $path . '"><img width="' . $width . '" height="' . $height . '" src="' . $src . $path . '" alt = "' . $prodname . '"></a></div>';
 								 $list .='
 								   <div class="proName">
-									<div class="name"><a href="' . $src . $path . '">' . $desc . '</a></div>
+									<div class="name"><a  href="' . $src . $path . '">' . $desc . '</a></div>
 									<div class="price">' . $price . '</div>
 									<div class="cart">
 										<label class="btn">';

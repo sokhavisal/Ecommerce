@@ -228,7 +228,7 @@ label.btn:hover {
 #nav {width:100%; margin-bottom: 0px; position:relative; z-index:1;}
 
 #menu {
-	background:#392420;	
+	background-color:#80539b;	
 	height:54px;
 	margin:0 auto;
 	width:980px;
@@ -265,7 +265,7 @@ label.btn:hover {
 	font-family:Georgia, "Times New Roman", Times, serif;
 }
 #menu > ul > li:hover > a {
-	color:#fff;
+	color:#D3CFCE;
 }
 #menu > ul > li > div {
 	display: none;
@@ -838,6 +838,7 @@ background:none;}
     padding: 0px;
     width: 100%;
 }
+
 .powered-main:after { clear:both; display:block; content:""; }
 #powered {
     border-top:1px dotted #E0E0E0;
@@ -993,7 +994,7 @@ body { -webkit-text-size-adjust: auto; }
 
 
 .main-wrapper { padding:0px; }
-.wrapper { margin:0px 0 0 0; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+.menu { margin:0px 0 0 0; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
 
 .header-top-main, .wrapper, #footer, #powered, .header-top, #header-main, #header, #top-links { width:auto!important; }
 
@@ -1134,3 +1135,28 @@ input.large-field, select.large-field {width:175px;}
 .proName .cart .btn:hover, .product-list .cart .btn:hover, .proName .cart .button:hover, .product-list .cart .button:hover 
 
 { -moz-transition: all 0.5s ease 0s; -webkit-transition: all 0.5s ease 0s; -ms-transition: all 0.5s ease 0s; transition: all 0.5s ease 0s; }
+#subnavigation{
+    width: 980px;
+    height: 30px;
+    background-color: #FFF;
+   
+}
+#headergoogleads{
+    width: 980px;
+    height: 0 auto;
+    background-color: #DDD; 
+    margin: 15px 0px 0px 0px;
+}
+#footeradvertising{
+    width: 980px;
+    height: 100px;
+    background-color: #DDD; 
+    margin: 15px 0px 0px 0px;
+}
+#fb-likebox{
+     width: 980px;
+    height: auto;
+    background-color: #FFF; 
+    margin: 15px 0px 0px 0px;
+    
+}

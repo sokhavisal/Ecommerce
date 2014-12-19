@@ -58,7 +58,7 @@ else
 
 		<!--Featured Product Start-->
 		<div class="box mb0" id="featured">
-			<div class="box-heading-1"><span>Featured</span></div>
+			<div class="box-heading-1"><span style="color:#0099cc ">Featured</span></div>
 			<div class="box-content-1">
 				<div class="box-product-1" >
 					<?php

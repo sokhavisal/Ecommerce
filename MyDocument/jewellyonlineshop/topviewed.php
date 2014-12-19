@@ -56,7 +56,7 @@ else
 
 		<!--Top Views Start-->
 		<div class="box mb0" id="topviews">
-			<div class="box-heading-1"><span>TOP VIEWS</span></div>
+			<div class="box-heading-1"><span style="color:#0099cc"> TOP VIEWS</span></div>
 			<div class="box-content-1">
 				<div class="box-product-1" >
 					<?php

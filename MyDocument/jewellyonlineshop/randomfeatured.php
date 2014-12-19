@@ -44,7 +44,7 @@
 		 <div class="image"><a href="' . $src . $path . '"><img width="' . $width . '" height="' . $height . '" src="' . $src . $path . '" alt = "' . $prodname . '"></a></div>';
 		 $list .='
 		   <div class="proName">
-			<div class="name"><a href="' . $src . $path . '">' . $desc . '</a></div>
+			<div class="name"><a  href="' . $src . $path . '">' . $desc . '</a></div>
 			<div class="price">' . $price . '</div>
 			<div class="cart">
 				<label class="btn">';
@@ -75,7 +75,7 @@
 
 		$list .='
 		<div>
-		 <div class="image"><a href="' . $src . $path . '"><img width="' . $width . '" height="' . $height . '" src="' . $src . $path . '" alt = "' . $prodname . '"></a></div>';
+		 <div class="image"><a  href="' . $src . $path . '"><img width="' . $width . '" height="' . $height . '" src="' . $src . $path . '" alt = "' . $prodname . '"></a></div>';
 		 $list .='
 		   <div class="proName">
 			<div class="name"><a href="' . $src . $path . '">' . $desc . '</a></div>
