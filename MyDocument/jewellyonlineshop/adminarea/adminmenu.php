@@ -6,5 +6,6 @@
 		<td>| <a href="viewsubcat.php">Sub Categories</a></td>
 		<td>| <a href="viewusers.php">Users</a> |</td>
 		<td>| <a href="viewpage.php">PAGE</a> |</td>
+		<td>| <a href="w2uiAdmin/index.php">New Product Page</a> |</td>
 	</tr>
 </table>
