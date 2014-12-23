@@ -6,11 +6,6 @@
 $i=0;
     while($row = mysqli_fetch_array($query, MYSQLI_ASSOC))
     {
-//	$json['records'][]=(array(
-//	    'id'=>$row['mmenu_id'],
-//	    'MainCat'=>$row['mmenu_name'] 
-//		));
-	
 	$json['records']['id'][$i]=$row['mmenu_id'];
 	$json['records']['MainCat'][$i]=$row['mmenu_name'];
 	    $i++;

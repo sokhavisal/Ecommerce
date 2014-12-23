@@ -7,6 +7,8 @@ var popSiirePalam='';
 var rc='';
 var rs='';
 var MainCat='';
+ var MainCatArray=[];
+  var SubCatArray=[];
 function session_checking(){ 
     var result = false;
 	$.ajax({
@@ -25,30 +27,99 @@ function session_checking(){
 	});
 	return result;     
 } 
-// variable for create combobox in toolbar. 
+
+var obj = getDataMainCategory();
+
+
+
+
+var objSubCat = getDataSubCategory('003');
+// variable for create MainCategory combobox in toolbar. 
 var htmlMaincom='';
-htmlMaincom+='<input type="button" onclick="getDataMainCategory();"><form name=myform><label> Main Category Items: </label>';
-htmlMaincom+='<select id="my_select" onchange="">';
+htmlMaincom+='<form  name=myform><label>Category Item : </label>';
+htmlMaincom+='<select id="my_select" onchange="getValueCombo(this)">';
 htmlMaincom+='<option name=one value=one id="0" selected >  </option>';
-htmlMaincom+='<option name=one value=one id="1" > Diamond </option>';
-htmlMaincom+='<option name=two value=two id="2"> Gold </option>';
-htmlMaincom+='<option name=three value=three id="3"> Silver </option>';
-htmlMaincom+='<option name=four value=four id="4"> four </option>';
+  for(var i=0;i<3;i++){
+       htmlMaincom+='<option name=one value='+ obj.MainCat[i]+' id='+ obj.id[i]+' >'+ obj.MainCat[i]+' </option>';
+    }
 htmlMaincom+='</select>';
 htmlMaincom+='</form>';
+
+
+var htmlItemcom='';
+htmlItemcom+='<form id="combo1" name=myform><label> Item Type : </label>';
+htmlItemcom+='<select id="my_select" onchange="getValueSubCombo(this)">';
+htmlItemcom+='<option name=one value=one id="0" selected >  </option>';
+//if(typeof  MainCatArray[0]=='undefined'){
+//   htmlItemcom+='<option name=one value="1" id="2" > dfsdsf    </option>';
+// }else{
+    
+      for(var i=0;i<10;i++){
+       htmlItemcom+='<option name=one value='+objSubCat.id[i]+' id='+objSubCat.id[i]+' >'+objSubCat.SubCatName[i]+' </option>';
+     }
+// }
+htmlItemcom+='</select>';
+htmlItemcom+='</form>';
+
+
+
 
 function getValueCombo(s){
     var valueCat=(s[s.selectedIndex].value); // get value
     var IdCate=(s[s.selectedIndex].id);
-    var CmboArr=new Array();
-cmboArry=[IdCate,valueCat];
-alert(cmboArry);
-w2ui.gExport.lock('Loading..',true);
-return cmboArry;
+   
+    MainCatArray[0]=IdCate ;
+    MainCatArray[1]=valueCat;
+    //alert(objSubCat);
+    $("#combo1").show();
+   alert(objSubCat.id);
+   w2ui.gExport.reload();
+    // use ajax for to select Sub Category pass in combobox. 
+   
+    
+
+
+return MainCatArray;
+}
+
+function getValueSubCombo(s){
+    var valueCat=(s[s.selectedIndex].value); // get value
+    var IdCate=(s[s.selectedIndex].id);
+   
+    SubCatArray[0]=IdCate ;
+    SubCatArray[1]=valueCat;
+    alert(str);
+    
+    // use ajax for to select Sub Category pass in combobox. 
+   
+    
+//w2ui.gExport.lock('Loading..',true);
+return SubCatArray;
+}
+
+
+function getDataSubCategory(param){
+ // MainCatID= MainCatID;
+     var SubCat ;
+	var row={rows:[]};
+       row['rows'][0] = param ;
+    $.ajax({
+	url:'getdata_SubCategory.php',
+	dataType: 'json', 
+	type:'POST',
+	data:row,
+	async:false,
+	success:function(data){ 
+
+	    SubCat=data.records;
+	
+	}
+	
+    });
+    return SubCat;
 }
 
 function getDataMainCategory(){
-     var MainCatearr=new Array();
       var MainCat ;
        //row['rows'][0] =  '1';
     $.ajax({
@@ -58,10 +129,7 @@ function getDataMainCategory(){
 	//data:row,
 	async:false,
 	success:function(data){ 
-//	$.each(data.records, function(key, value) {
-//	   MainCatearr[key]=value;
-//	    alert(MainCatearr[key]);
-//});
+
 	    MainCat=data.records;
 	
 	}
@@ -69,7 +137,6 @@ function getDataMainCategory(){
     }); 
     return MainCat;
 }
-
 
 
 var main={
@@ -97,7 +164,7 @@ var main={
 			    { type: 'break' },
 			    {type:'html',id:'MainCat',html:htmlMaincom},
 			    { type: 'break' },
-			    {type:'html',id:'SubCate',html:htmlMaincom},
+			    {type:'html',id:'SubCate',html:htmlItemcom},
 			{ type: 'spacer' },
 			{ type: 'button',  id: 'logout', caption: 'ログアウト', icon:'icn-door-in' }   
 		    ],
@@ -161,7 +228,9 @@ $(document).ready(function(){
     w2utils.locale('ja-jp');
     $('#layout').w2layout(main);    
     w2ui.layout.content('main',$().w2grid(gExport));
-    w2ui.layout.load('top','header.php');   
+    w2ui.layout.load('top','header.php');    
+    $("#combo1").hide();
+    
     //$('input[type=list]').w2field('list', {options:{items:people}});
 });
 $(window).resize(function() {
