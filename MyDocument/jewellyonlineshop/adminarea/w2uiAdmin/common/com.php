@@ -1,172 +1,188 @@
 <?php
-function SaveExcelEX ($FileName,$Data) {
 
-	#日本語が読み込まれない場合に記述
-	setlocale(LC_ALL,'ja_JP.UTF-8');
-	//HTTP出力文字コードの設定
-	mb_http_output('UTF-8');
 
-	$FileName = convertEncoding(str_replace('^.*[. ]|.*[\p{Cntrl}\\/:*?"<>|]','',$FileName), 'SJIS');
-
-	$DataList['header'] = array();
-	$DataList['records'] = array();
-	$DataList['footer'] = array();
-	$DataPos = array();
+//定数
+const DISP_TAXN =' 税抜'; 
+const DISP_TAXT =' 税込'; 
+/**
+ * 共通暗号化キー
+ */
+const ENCRIPTION_KEY    = 'T2cEV4DD2xo9X11a';
 	
-	
-	//W2UIJSONデータから、出力用に変換する
-	foreach ($Data as $key => $value){
-		$RowData = array();
-		if ($key == 'columns') {
-			for($i=0;count($value) > $i;$i++) {
-				$RowData[] = $value[$i]['caption'];
-				$DataPos[] = $value[$i]['field'];
+
+//エラー処理
+set_error_handler( 'my_error_handler', E_ALL ); 
+set_exception_handler( 'my_exception_handler' );
+
+/**
+* エラー＆警告出力関数
+* [備考]
+* 
+* @param エラー情報
+* @return 
+*/	
+function my_error_handler ( $errno, $errstr, $errfile, $errline, $errcontext ) {
+     error_log(date("Y-m-d H:i:s").":"."[$errno] $errstr $errfile($errline)\n", 3, __DIR__ .'/../logs/'.date("Ymd").'error.log');
+}
+function my_exception_handler ( $e ) {
+     error_log(date("Y-m-d H:i:s").":".$e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ")\n", __DIR__ .'/../logs/'.date("Ymd").'error.log');
+}
+/**
+* 基本設定取得関数
+* [備考]
+* 
+* @param なし
+* @return なし
+*/	
+function initBaseSetting () {
+	$sql  = "SELECT";
+	$sql .= " KeyName ";
+	$sql .= ",ValueName01 ";
+	$sql .= "FROM M_SystemSetting ";
+	$sql .= "WHERE KeyName = 'BaceSetting'";	
+
+	$result=SQLQuery($sql);
+	if (false !== $result) {
+		$result[0]['ValueName01'] = preg_replace("(\r\n|\n|\r)",PHP_EOL,$result[0]['ValueName01']);
+		$Buff = explode(PHP_EOL,$result[0]['ValueName01']);
+		for($i=0;count($Buff)>$i;$i++){
+			$Tmp=explode(':',$Buff[$i]);
+			if(isset($Tmp[0])) {
+				$_SESSION['BaceSetting'][$Tmp[0]] = (isset($Tmp[1])?$Tmp[1]:null);
 			}
-			$DataList['header'][] = $RowData;
-		} else if ($key == 'records') {
-			for($i=0;count($value) > $i;$i++) {
-				$RowData = array();
-				for($ii=0;count($DataPos) > $ii;$ii++) {
-					$RowData[] = (array_key_exists($DataPos[$ii],$value[$i]))?$value[$i][$DataPos[$ii]]:'';
-				}
-				if(array_key_exists('summary',$value[$i])){
-					$DataList['footer'][] = $RowData;
-				} else {
-					$DataList['records'][] = $RowData;
-				}
-			}			
 		}
 	}
-
-	if(preg_match('/.csv/',$FileName)) {
-		$csv = "";
-		$HColCnt = count($DataList['header'][0]);
-		$HRowCnt = count($DataList['header']);
-		$RRowCnt = count($DataList['records']);
-		$FRowCnt = count($DataList['footer']);
-
-		//CSVデータ作成
-		$csv  = csv($HRowCnt, $HColCnt, $DataList['header']);
-		$csv .= csv($RRowCnt, $HColCnt, $DataList['records']);
-		$csv .= csv($FRowCnt, $HColCnt, $DataList['footer']);
-		
-		//ファイルを追記モードで開く
-		$fp = fopen($FileName, 'w');
-		flock($fp, LOCK_EX);
-		fputs($fp,mb_convert_encoding($csv,'sjis-win','UTF-8'));
-		fclose($fp);
-
-		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename=' . $FileName);
-		readfile($FileName);
-		//ファイル削除
-		unlink($FileName);
-	} else {
-		require_once('PHPExcel.php');
-		require_once('PHPExcel/IOFactory.php');
-		require_once('PHPExcel/Cell.php');
-
-		if(strpos($FileName,'.xlsx') > 0) {
-			$Type='Excel2007';
-		} else if(strpos($FileName,'.xls') > 0) {
-			$Type='Excel5';
-		} else {
-			exit(0);
-		}
-
-		$cell_style = array(
-			'numberformat' => array('code' => PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-			'borders' => array(
-				'top'     => array('style' => PHPExcel_Style_Border::BORDER_THIN),
-				'bottom'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
-				'left'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
-				'right'   => array('style' => PHPExcel_Style_Border::BORDER_THIN)
-			)
-		);
-
-		//オブジェクトの生成
-		$xl = new PHPExcel();
-
-		//シートの設定
-		$xl->setActiveSheetIndex(0);
-		$sheet = $xl->getActiveSheet();
-		$sheet->setTitle('Sheet1');
-		//スタイルの設定(標準フォント)
-//		$sheet->getDefaultStyle()->getFont()->setName('ＭＳ Ｐゴシック');
-//		$sheet->getDefaultStyle()->getFont()->setSize(11);
-
-		$HColCnt = count($DataList['header'][0]);
-		$HRowCnt = count($DataList['header']);
-		$RRowCnt = count($DataList['records']) + $HRowCnt;
-		$FRowCnt = count($DataList['footer']) + $RRowCnt;
-
-		//ヘッダー部の書き出し
-		$pos = 0;
-		for($row = 1; $row <= $HRowCnt; $row++) {
-			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['header'][$pos][$col]);
-				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
-			}
-			$pos = $pos+1;
-		}
-		//データ部の書き出し
-		$pos = 0;
-		for($row = $HRowCnt+1; $row <= $RRowCnt; $row++) {
-			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['records'][$pos][$col]);
-			}
-			$pos = $pos+1;
-		}
-		//フッタ部の書き出し
-		$pos=0;
-		for($row = $RRowCnt+1; $row <= $FRowCnt; $row++) {
-			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['footer'][$pos][$col]);
-				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
-			}
-			$pos = $pos+1;
-		}
-
-		//ヘッダー部スタイル設定
-		for($row = 1; $row <= $HRowCnt; $row++) {
-			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->getStyleByColumnAndRow($col, $row)->applyFromArray($cell_style);
-				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->getStartColor()->setARGB('FFeeeeee');
-				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-			}
-		}
-		//データ部スタイル設定
-		$LeftTop = 1+$HRowCnt;
-		$v_range = 'A'.$LeftTop.':'.PHPExcel_Cell::stringFromColumnIndex($HColCnt-1).$RRowCnt;
-		$sheet->getStyle($v_range)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-		$sheet->getStyle($v_range)->getAlignment()->setWrapText(true);
-		//フッタ部スタイル設定
-		for($row = $RRowCnt+1; $row <= $FRowCnt; $row++) {
-			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->getStyleByColumnAndRow($col, $row)->applyFromArray($cell_style);
-				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->getStartColor()->setARGB('FFeeeeee');
-				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-			}
-		}
-
-		//範囲選択の解除(※A1セルを選択)
-		$sheet->getStyleByColumnAndRow(0, 1);
-
-		//ブラウザへ出力をリダイレクト
-		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="'.$FileName.'"');
-		header('Cache-Control: max-age=0');
-		$writer = PHPExcel_IOFactory::createWriter($xl,$Type);
-		$writer->save('php://output');
-
-		//$xl->excel->disconnectWorksheets();  
-		unset($xl->excel);
-	}
-	exit;
-
+}
+/**
+ * 現在の環境パス(DOCUMENT_ROOTを'/'とした絶対パス)を返す
+ * 定数'ROOTFOLDER'は、各環境の定数ファイル(sys_const.php)で定義する
+ * ROOTFOLDERが未定義の場合は、このファイル(com_func.php)の設置パスを返す
+ * @return string 環境パス
+ */
+function GetCurrentEnvironment() {
+//    $docRoot = filter_input(INPUT_SERVER, 'DOCUMENT_ROOT');
+    $docRoot = (isset($_SERVER['DOCUMENT_ROOT'])) ? $_SERVER['DOCUMENT_ROOT'] : realpath(__DIR__.'/../');
+    if (!defined('ROOTFOLDER')) {
+        $absolutePath = realpath(__DIR__);
+    } else {
+        $absolutePath = realpath(ROOTFOLDER);
+    }
+    if (substr(PHP_OS,0,3) === 'WIN') {
+        $absolutePath = mb_ereg_replace('\\\\', '/', $absolutePath);
+    }
+    return(mb_ereg_replace('^'.$docRoot, '', $absolutePath));
 }
 
+/**
+* Encrypt data
+*
+* @param  string $data
+* @param  string $key
+* @return string
+*/
+function dataEncrypt($data, $key)
+{
+	//データ　及びキーが無い場合は処理しない。
+	if(strlen($data)<=0 || strlen($key)<=0) return null;
+	
+    // Open module
+    $resource = mcrypt_module_open('rijndael-256', '',  'cbc', '');
 
+    // Get key
+    $keys = _getKey($resource, $key);
+
+    // Create initial vector
+    $initialVector = _createIVector($resource);
+
+    // Encrypt data
+    mcrypt_generic_init($resource, $keys, $initialVector);
+    $data = mcrypt_generic($resource, $data);
+    
+    // Terminate decryption handle
+    mcrypt_generic_deinit($resource);
+
+    // Close module
+    mcrypt_module_close($resource);
+
+    return base64_encode($initialVector) . '@' . base64_encode($data);
+}
+
+/**
+* Decrypt data
+*
+* @param  string $data
+* @param  string $key
+* @return string
+*/
+function dataDecrypt($data, $key)
+{
+	//データ　及びキーが無い場合は処理しない。
+	if(strlen($data)<=0 || strlen($key)<=0) return null;
+    // Open module
+    $resource = mcrypt_module_open('rijndael-256', '',  'cbc', '');
+
+    // Get key
+    $keys = _getKey($resource, $key);
+
+    // Get initial vector
+    $initialVector = _getIVector($data);
+
+    // Decrypt data
+    $tmp = substr($data, strlen($initialVector)+1);
+    mcrypt_generic_init($resource, $keys, base64_decode($initialVector));
+	if(!$tmp){
+		$data = "";		
+	}else {
+		$data = trim(mdecrypt_generic($resource, base64_decode($tmp)));
+	}
+
+    // Terminate decryption handle
+    mcrypt_generic_deinit($resource);
+
+    // Close module
+    mcrypt_module_close($resource);
+
+    return $data;
+}
+
+/**
+* Get Key
+*
+* @param  string $resource
+* @param  string $key
+* @return key
+*/
+function _getKey($resource, $key)
+{
+    return substr(md5($key), 0, mcrypt_enc_get_key_size($resource));
+}
+
+/**
+* Create initial vector
+*
+* @param  string $resource
+* @return initial vector
+*/
+function _createIVector($resource)
+{
+    if (PHP_OS == 'WIN32' || PHP_OS == 'WINNT') {
+        srand();
+        return mcrypt_create_iv(mcrypt_enc_get_iv_size($resource), MCRYPT_RAND);
+    } else {
+        return mcrypt_create_iv(mcrypt_enc_get_iv_size($resource), MCRYPT_DEV_URANDOM);
+    }
+}
+
+/**
+* Get initial vector
+*
+* @param  string $data
+* @return initial vector
+*/
+function _getIVector($data)
+{
+    return substr($data, 0, strpos($data, '@'));
+}
 //タグの削除
 function deleteTag($text)
 {
@@ -459,7 +475,7 @@ function csvToArray($filename)
 	$list = fopen($filename,'r'); 
 	$h = 0;
 
-	while ($array = fgetcsv($list, 1000,",")) 
+	while ($array = fgetcsv($list, 0,',','"')) 
 	{
 		for ($i = 0; $i < count($array); $i++)
 		{
@@ -545,6 +561,179 @@ class Json {
 	public function save() {
 		file_put_contents($this->filename, json_encode($this->data));
 	}
+}
+/**
+* ファイル出力（csv,Excel,Excel2007）
+* [備考]
+*	W2UIのJSONデータから作成する。
+* @param string $FileName ファイル名
+* @param string $Data 出力データ
+*/
+function SaveExcelEX ($FileName,$Data) {
+
+	#日本語が読み込まれない場合に記述
+	setlocale(LC_ALL,'ja_JP.UTF-8');
+	//HTTP出力文字コードの設定
+	mb_http_output('UTF-8');
+
+	$FileName = convertEncoding(str_replace('^.*[. ]|.*[\p{Cntrl}\\/:*?"<>|]','',$FileName), 'SJIS');
+
+	$DataList['header'] = array();
+	$DataList['records'] = array();
+	$DataList['footer'] = array();
+	$DataPos = array();
+	
+	
+	//W2UIJSONデータから、出力用に変換する
+	foreach ($Data as $key => $value){
+		$RowData = array();
+		if ($key == 'columns') {
+			for($i=0;count($value) > $i;$i++) {
+				$RowData[] = $value[$i]['caption'];
+				$DataPos[] = $value[$i]['field'];
+			}
+			$DataList['header'][] = $RowData;
+		} else if ($key == 'records') {
+			for($i=0;count($value) > $i;$i++) {
+				$RowData = array();
+				for($ii=0;count($DataPos) > $ii;$ii++) {
+					$RowData[] = (array_key_exists($DataPos[$ii],$value[$i]))?$value[$i][$DataPos[$ii]]:'';
+				}
+				if(array_key_exists('summary',$value[$i])){
+					$DataList['footer'][] = $RowData;
+				} else {
+					$DataList['records'][] = $RowData;
+				}
+			}			
+		}
+	}
+
+	if(preg_match('/.csv/',$FileName)) {
+		$csv = "";
+		$HColCnt = count($DataList['header'][0]);
+		$HRowCnt = count($DataList['header']);
+		$RRowCnt = count($DataList['records']);
+		$FRowCnt = count($DataList['footer']);
+
+		//CSVデータ作成
+		$csv  = csv($HRowCnt, $HColCnt, $DataList['header']);
+		$csv .= csv($RRowCnt, $HColCnt, $DataList['records']);
+		$csv .= csv($FRowCnt, $HColCnt, $DataList['footer']);
+		
+		//ファイルを追記モードで開く
+		$fp = fopen($FileName, 'w');
+		flock($fp, LOCK_EX);
+		fputs($fp,mb_convert_encoding($csv,'sjis-win','UTF-8'));
+		fclose($fp);
+
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename=' . $FileName);
+		readfile($FileName);
+		//ファイル削除
+		unlink($FileName);
+	} else {
+		require_once('PHPExcel.php');
+		require_once('PHPExcel/IOFactory.php');
+		require_once('PHPExcel/Cell.php');
+
+		if(strpos($FileName,'.xlsx') > 0) {
+			$Type='Excel2007';
+		} else if(strpos($FileName,'.xls') > 0) {
+			$Type='Excel5';
+		} else {
+			exit(0);
+		}
+
+		$cell_style = array(
+			'numberformat' => array('code' => PHPExcel_Style_NumberFormat::FORMAT_TEXT),
+			'borders' => array(
+				'top'     => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				'bottom'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				'left'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				'right'   => array('style' => PHPExcel_Style_Border::BORDER_THIN)
+			)
+		);
+
+		//オブジェクトの生成
+		$xl = new PHPExcel();
+
+		//シートの設定
+		$xl->setActiveSheetIndex(0);
+		$sheet = $xl->getActiveSheet();
+		$sheet->setTitle('Sheet1');
+		//スタイルの設定(標準フォント)
+//		$sheet->getDefaultStyle()->getFont()->setName('ＭＳ Ｐゴシック');
+//		$sheet->getDefaultStyle()->getFont()->setSize(11);
+
+		$HColCnt = count($DataList['header'][0]);
+		$HRowCnt = count($DataList['header']);
+		$RRowCnt = count($DataList['records']) + $HRowCnt;
+		$FRowCnt = count($DataList['footer']) + $RRowCnt;
+
+		//ヘッダー部の書き出し
+		$pos = 0;
+		for($row = 1; $row <= $HRowCnt; $row++) {
+			for($col = 0; $col < $HColCnt; $col++) {
+				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['header'][$pos][$col]);
+				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
+			}
+			$pos = $pos+1;
+		}
+		//データ部の書き出し
+		$pos = 0;
+		for($row = $HRowCnt+1; $row <= $RRowCnt; $row++) {
+			for($col = 0; $col < $HColCnt; $col++) {
+				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['records'][$pos][$col]);
+			}
+			$pos = $pos+1;
+		}
+		//フッタ部の書き出し
+		$pos=0;
+		for($row = $RRowCnt+1; $row <= $FRowCnt; $row++) {
+			for($col = 0; $col < $HColCnt; $col++) {
+				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['footer'][$pos][$col]);
+				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
+			}
+			$pos = $pos+1;
+		}
+
+		//ヘッダー部スタイル設定
+		for($row = 1; $row <= $HRowCnt; $row++) {
+			for($col = 0; $col < $HColCnt; $col++) {
+				$sheet->getStyleByColumnAndRow($col, $row)->applyFromArray($cell_style);
+				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->getStartColor()->setARGB('FFeeeeee');
+				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			}
+		}
+		//データ部スタイル設定
+		$LeftTop = 1+$HRowCnt;
+		$v_range = 'A'.$LeftTop.':'.PHPExcel_Cell::stringFromColumnIndex($HColCnt-1).$RRowCnt;
+		$sheet->getStyle($v_range)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+		$sheet->getStyle($v_range)->getAlignment()->setWrapText(true);
+		//フッタ部スタイル設定
+		for($row = $RRowCnt+1; $row <= $FRowCnt; $row++) {
+			for($col = 0; $col < $HColCnt; $col++) {
+				$sheet->getStyleByColumnAndRow($col, $row)->applyFromArray($cell_style);
+				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->getStartColor()->setARGB('FFeeeeee');
+				$sheet->getStyleByColumnAndRow($col, $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			}
+		}
+
+		//範囲選択の解除(※A1セルを選択)
+		$sheet->getStyleByColumnAndRow(0, 1);
+
+		//ブラウザへ出力をリダイレクト
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="'.$FileName.'"');
+		header('Cache-Control: max-age=0');
+		$writer = PHPExcel_IOFactory::createWriter($xl,$Type);
+		$writer->save('php://output');
+
+		//$xl->excel->disconnectWorksheets();  
+		unset($xl->excel);
+	}
+	exit;
+
 }
 /**
 * ファイル出力（csv,Excel,Excel2007）
@@ -664,7 +853,7 @@ fclose($fp);
 		$pos = 0;
 		for($row = 1; $row <= $HRowCnt; $row++) {
 			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['header'][$pos][$col]);
+				$sheet->setCellValueByColumnAndRow( $col, $row, AKE(AKE(AKE($DataList,'header'),$pos),$col));
 				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
 			}
 			$pos = $pos+1;
@@ -673,7 +862,7 @@ fclose($fp);
 		$pos = 0;
 		for($row = $HRowCnt+1; $row <= $RRowCnt; $row++) {
 			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['records'][$pos][$col]);
+				$sheet->setCellValueByColumnAndRow( $col, $row, AKE(AKE(AKE($DataList,'records'),$pos),$col));
 			}
 			$pos = $pos+1;
 		}
@@ -681,7 +870,7 @@ fclose($fp);
 		$pos=0;
 		for($row = $RRowCnt+1; $row <= $FRowCnt; $row++) {
 			for($col = 0; $col < $HColCnt; $col++) {
-				$sheet->setCellValueByColumnAndRow( $col, $row, $DataList['footer'][$pos][$col]);
+				$sheet->setCellValueByColumnAndRow( $col, $row, AKE(AKE(AKE($DataList,'footer'),$pos),$col));
 				$sheet->getStyleByColumnAndRow($col, $row)->getAlignment()->setWrapText(true);
 			}
 			$pos = $pos+1;
@@ -719,7 +908,7 @@ fclose($fp);
 		$writer = PHPExcel_IOFactory::createWriter($xl,$Type);
 		$writer->save('php://output');
 
-		$xl->excel->disconnectWorksheets();  
+		$xl->excel->disconnectWorksheets();
 		unset($xl->excel);
 	}
 	exit;
@@ -822,7 +1011,8 @@ function _table($val){
 */
 function getFunctionFlg($FunctionName,$link)
 {
-	$sql="SELECT FunctionFlg FROM A_Setting WHERE FunctionName='".S($FunctionName)."'";
+	/*
+	$sql="SELECT FunctionFlg FROM A_Setting WHERE FunctionName='".SI($FunctionName)."'";
 	$result = mysql_query($sql, $link);
 	$FunctionFlg=0;
 	//一行目のみ取得
@@ -834,17 +1024,17 @@ function getFunctionFlg($FunctionName,$link)
 		//自社内からのアクセスでは無い場合
 		if(gethostbyname("atomicgolf.info") != $_SERVER['REMOTE_ADDR']){
 			//レコードの作成
-			$sql="INSERT INTO A_Setting (FunctionName) VALUES ('".S($FunctionName)."')";
+			$sql="INSERT INTO A_Setting (FunctionName) VALUES ('".SI($FunctionName)."')";
 		} else {
 			//レコードの作成
-			$sql="INSERT INTO A_Setting (FunctionName,FunctionFlg) VALUES ('".S($FunctionName)."',1)";	
+			$sql="INSERT INTO A_Setting (FunctionName,FunctionFlg) VALUES ('".SI($FunctionName)."',1)";	
 			$FunctionFlg=1;
 		}
 		mysql_query($sql, $link);
 		
 	}
 	mysql_free_result($result);
-	
+*/	
 	//現行はフルオープンのため、全て使えるフラグを返す。
 	$FunctionFlg=1;
 				
@@ -858,7 +1048,7 @@ function getFunctionFlg($FunctionName,$link)
 * @param string $DefaultWhere 基準抽出条件　例：項目名=1
 * @return string SQL文
 */
-//function getSQLWhereTerms($DefaultWhere)
+//function getSQLOrderTerms($DefaultWhere)
 function getSQLWhereTerms($DefaultWhere = '')
 {
 //	$lget=$_GET;
@@ -872,8 +1062,8 @@ function getSQLWhereTerms($DefaultWhere = '')
 			$Where.= $DefaultWhere." AND ";
 		}
 		for($i = 0; $i <count($lget['search']);$i++){
-//fldr			if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: $lget['search-logic'])." ";
-			if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: array_key_exists('search-logic',$lget) ? $lget['search-logic'] : '').' ';
+			if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: $lget['search-logic'])." ";//search for kakaku com
+			//if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: array_key_exists('search-logic',$lget) ? $lget['search-logic'] : '').' ';
 			if(mb_strlen($lget['search'][$i]['field'])>0){
 				switch ($lget['search'][$i]['type']){
 				case 'text':
@@ -881,14 +1071,37 @@ function getSQLWhereTerms($DefaultWhere = '')
 					break;
 				case 'date':
 					if(count($lget['search'][$i]['value'])==1) {
-						$Val=date("Y-m-d",($lget['search'][$i]['value']/1000)+25569);
+						if (preg_match('/($^)|(^\d{4}(-|\/)\d{2}(-|\/)\d{2}$)/', $lget['search'][$i]['value']) == 1) {
+							$Val=$lget['search'][$i]['value'];
+						} else {
+							$Val=date("Y-m-d",($lget['search'][$i]['value']/1000)+25569);
+						}
 					} else {
-						$Val1=date("Y-m-d",($lget['search'][$i]['value'][0]/1000)+25569);
-						$Val2=date("Y-m-d",($lget['search'][$i]['value'][1]/1000)+25569);						
+						if (preg_match('/($^)|(^\d{4}(-|\/)\d{2}(-|\/)\d{2}$)/', $lget['search'][$i]['value'][0]) == 1) {
+							$Val1=$lget['search'][$i]['value'][0];
+						} else {
+							$Val1=date("Y-m-d",($lget['search'][$i]['value'][0]/1000)+25569);
+						}
+						if (preg_match('/($^)|(^\d{4}(-|\/)\d{2}(-|\/)\d{2}$)/', $lget['search'][$i]['value'][1]) == 1) {
+							$Val2=$lget['search'][$i]['value'][1];
+						} else {
+							$Val2=date("Y-m-d",($lget['search'][$i]['value'][1]/1000)+25569);
+						}
+//						$Val1=date("Y-m-d",($lget['search'][$i]['value'][0]/1000)+25569);
+//						$Val2=date("Y-m-d",($lget['search'][$i]['value'][1]/1000)+25569);
 					}
 					break;
 				case 'int':
-					$Val=$lget['search'][$i]['value'][0];
+					if (is_array($lget['search'][$i]['value'])) {
+						if(count($lget['search'][$i]['value'])==1) {
+							$Val=$lget['search'][$i]['value'][0];
+						} else {
+							$Val1=$lget['search'][$i]['value'][0];
+							$Val2=$lget['search'][$i]['value'][1];
+						}
+					} else {
+						$Val=$lget['search'][$i]['value'];
+					}
 					break;
 				default :
 					$Val=$lget['search'][$i]['value'];
@@ -902,28 +1115,34 @@ function getSQLWhereTerms($DefaultWhere = '')
 						break;
 					//後方一致
 					case 'ends with':
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."'";				
+						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."'";
 						$AddFlg++;
 						break;
 					//含む
 					case 'contains':
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";				
+						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";
 						$AddFlg++;
 						break;
 					//完全一致
 					case 'is':
-						$Where.= $lget['search'][$i]['field']." = '".$Val."'";				
+						$Where.= $lget['search'][$i]['field']." = '".$Val."'";
 						$AddFlg++;
 						break;
 					//間
 					case 'between':
-						$Where.= "DATE(".$lget['search'][$i]['field'].") >= '".$Val1."' AND DATE(".$lget['search'][$i]['field'].") <= '".$Val2."'";				
+						if ($Val1 !== '' && $Val2 !== '') {
+							$Where.= "(".$lget['search'][$i]['field']." >= '".$Val1."' AND ".$lget['search'][$i]['field']." <= '".$Val2."')";
+						} else if ($Val1 !== '') {
+							$Where.= $lget['search'][$i]['field']." >= '".$Val1."'";
+						} else if ($Val2 !== '') {
+							$Where.= $lget['search'][$i]['field']." <= '".$Val2."'"; 
+						}
 						$AddFlg++;
-						break;					
+						break;
 					case 'in':
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";				
-						$AddFlg++;						
-						break;					
+						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";
+						$AddFlg++;
+						break;
 					}
 			}
 		}
@@ -941,92 +1160,43 @@ function getSQLWhereTerms($DefaultWhere = '')
 * @param string $DefaultOrder 基準並び順　例：項目名　ASC
 * @return string SQL文
 */
-//function getSQLOrderTerms($DefaultAND)
-function getSQLANDTerms($DefaultWhere = '')
-{
-//	$lget=$_GET;
-        $lget = (array_key_exists('search', $_GET)) ? $_GET : $_POST;
-	$Where="";
-//	if ($lget['search']!=null){
-	if (array_key_exists('search',$lget)){
-		$Where=" AND ( ";
-		$AddFlg=0;
-//		$AddFlgF=1;
-//		$RF=TRUE;
-		if(mb_strlen($DefaultWhere)>0){ 
-			$Where.= $DefaultWhere." AND ";
-		}
-		for($i = 0; $i <count($lget['search']);$i++){
-//fldr			if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: $lget['search-logic'])." ";
-			if($AddFlg) $Where.= " ".(array_key_exists('searchLogic',$lget) ? $lget['searchLogic']: array_key_exists('search-logic',$lget) ? $lget['search-logic'] : '').' ';
-			if(mb_strlen($lget['search'][$i]['field'])>0){
-				switch ($lget['search'][$i]['type']){
-				case 'text':
-					$Val=$lget['search'][$i]['value'];
-					break;
-				case 'date':
-					if(count($lget['search'][$i]['value'])==1) {
-						$Val=date("Y-m-d",($lget['search'][$i]['value']/1000)+25569);
-					} else {
-						$Val1=date("Y-m-d",($lget['search'][$i]['value'][0]/1000)+25569);
-						$Val2=date("Y-m-d",($lget['search'][$i]['value'][1]/1000)+25569);						
-					}
-					break;
-				case 'int':
-					$Val=$lget['search'][$i]['value'][0];
-					break;
-				default :
-					$Val=$lget['search'][$i]['value'];
-					break;				
-				}
-				switch ($lget['search'][$i]['operator']){
-					//前方一致
-					case 'begins with':
-						$Where.= $lget['search'][$i]['field']." LIKE '".$Val."%'";
-						$AddFlg++;
-						 $Where.=')';
-						break;
-					//後方一致
-					case 'ends with':
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."'";				
-						$AddFlg++;
-						break;
-					//含む
-					case 'contains':
-						
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";				
-						$AddFlg++;
-						if ($AddFlg==3){
-						    $Where.=')';
-						}
-						if (count($lget['search'])==1) {
-						     $Where.=')';
-						    }
-						break;
-					//完全一致
-					case 'is':
-						$Where.= $lget['search'][$i]['field']." = '".$Val."'";				
-						$AddFlg++;
-						break;
-					//間
-					case 'between':
-						$Where.= "DATE(".$lget['search'][$i]['field'].") >= '".$Val1."' AND DATE(".$lget['search'][$i]['field'].") <= '".$Val2."'";				
-						$AddFlg++;
-						break;					
-					case 'in':
-						$Where.= $lget['search'][$i]['field']." LIKE '%".$Val."%'";				
-						$AddFlg++;						
-						break;					
-					}
-			}
-		}
-
-	} else if($DefaultWhere){
-		$Where=" WHERE ".$DefaultWhere;
-	}
-	return $Where;
-}
 //function getSQLOrderTerms($DefaultOrder)
+function getSQLLimitOffset($DefaultLimit = ''){
+    $strLimit="";
+	$offset="";
+	$limit="";
+    $lget = (array_key_exists('limit',$_GET)) ? $_GET : $_POST;
+	if (array_key_exists('limit', $lget)) {
+//            if (is_array($lget['limit'])) {
+                $limit .= $lget['limit'];
+		$strLimit=' LIMIT '.$limit;
+//            }
+        }
+	
+	$lget = (array_key_exists('offset',$_GET)) ? $_GET : $_POST;
+	if (array_key_exists('offset', $lget)) {
+//            if (is_array($lget['offset'])) {
+                $offset .= $lget['offset'];
+		$strLimit.=' OFFSET '.$offset;
+//            }
+        }
+	
+	 return $strLimit;
+}
+
+function getSQLOffset($DefaultLimit = ''){
+	$offset=0;				
+	$lget = (array_key_exists('offset',$_GET)) ? $_GET : $_POST;
+	if (array_key_exists('offset', $lget)) {
+//            if (is_array($lget['offset'])) {
+                $offset .= $lget['offset'];
+					
+//            }
+        }
+	
+	 return $offset;
+}
+
 function getSQLOrderTerms($DefaultOrder = '')
 {
 //	$Order="";
@@ -1064,7 +1234,337 @@ function getSQLOrderTerms($DefaultOrder = '')
         if (trim($DefaultOrder) !== '') {
             $Order .= (trim($DefaultOrder)).',';
         }
+	
+	
+	
+	
         return (($Order !== '') ? ' ORDER BY '.rtrim($Order,',') : '');
         
+}
+
+/**
+* 外部DBアクセス関数
+* [備考]
+* 指定されたホストへ暗号化されたSQLを発行し連想配列を取得する。
+* 配列先頭のstatusが「ok」の場合は、正常終了
+* 「fail」の場合は、エラーメッセージを戻す。
+* 
+* @param string $sql SQL文
+* @param string $back 戻り値　true：連想配列　false：クラス
+* @param string $GetFlg 0:SELECT文　0以外：その他
+* @return string 
+*/
+function fncExecuteSQL($sql,$back,$GetFlg) {
+				
+	if(strlen($sql)==0)return null;
+	
+	$url = JSV_HOST.'jsv/jsv.php';
+
+	$key = md5(JSV_KEY);
+	//暗号化モジュール使用開始
+	$td  = mcrypt_module_open('des', '', 'ecb', '');
+	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
+	$iv  = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+
+	//暗号化モジュール初期化
+	if (mcrypt_generic_init($td, $key, $iv) < 0) {
+	  exit('error.');
+	}
+
+	//データを暗号化
+	$data = array(
+		"sql" => base64_encode(mcrypt_generic($td, $sql)),
+		"db" => base64_encode(mcrypt_generic($td, JSV_DB)),		
+		"md" => base64_encode(mcrypt_generic($td, $GetFlg)),		
+	);
+	mcrypt_generic_deinit($td);
+	mcrypt_module_close($td);
+	
+	$data = http_build_query($data, "", "&");
+
+	//header
+	$header = array(
+		"Content-Type: application/x-www-form-urlencoded",
+		"Content-Length: ".strlen($data),
+		'User-Agent: My User Agent 1.0',    //ユーザエージェントの指定
+		//'Authorization: Basic '.base64_encode('user:pass'),//ベーシック認証
+	);
+	ini_set('user_agent', 'User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)');
+	$context = array(
+		"http" => array(
+			"method"  => "POST",
+			"header"  => implode("\r\n", $header),
+			"ignore_errors" => true,
+			"content" => $data
+		)
+	);
+	$query = AKE($_SERVER,'QUERY_STRING');
+	$final_uri = (strlen($query))?$url."?".$query:$url;
+	$json = @file_get_contents($final_uri, false, stream_context_create($context));
+	$pos = strpos($http_response_header[0], '200');
+	if ($pos !== false) {
+		return json_decode($json, $back);
+	} else {
+		return null;
+	}	
+	return null;
+	
+}
+/**
+* 外部DBExec関数
+* [備考]
+* INSERTなどのレコードを返さないSQLを発行
+* 作用したレコード件数を返す
+* @param string $sql SQL文
+* @return string 連想配列
+*/
+function SQLExec($sql,&$cnt) {
+	
+	$rec = fncExecuteSQL($sql,true,2);
+	$buff = (isset($rec[0]))?$rec[0]:null;
+	if('ok' != (array_key_exists('status',$buff)?$buff['status']:null)){
+		return false;
+	}
+	$cnt +=$rec[1]['count'];
+	return true;
+}
+/**
+* 外部DBExecute関数
+* [備考]
+* INSERTなどのレコードを返さないSQLを発行
+* 
+* @param string $sql SQL文
+* @return string 連想配列
+*/
+function SQLExecute($sql) {
+	
+	$rec = fncExecuteSQL($sql,true,1);
+	$buff = (isset($rec[0]))?$rec[0]:null;
+	if($buff!=null){
+		if('ok' != (array_key_exists('status',$buff)?$buff['status']:null)){
+			return false;
+		}
+	} else {
+		return false;
+	}
+	return true;
+}
+
+/**
+* 外部DBQuery関数
+* [備考]
+* SELECT文専用関数
+* 
+* @param string $sql SQL文
+* @return string 連想配列
+*/
+function SQLQuery($sql) {
+	$rec = fncExecuteSQL($sql,true,0);
+	if(!empty($rec) && isset($rec[0])) {
+		if('ok' != (array_key_exists('status',$rec[0])?$rec[0]['status']:null)){
+			return false;
+		}
+	} else {
+			return false;		
+	}
+	return $rec[1];
+//	return fncExecuteSQL($sql,true,0);
+}
+/**
+* SQLインジェクション対策自前
+* [備考]
+* 
+* @param string $str 変換前文字列
+* @return string 変換後文字列
+*/
+function SI($str) {
+	$search=array("\\","\0","\n","\r","\x1a","'",'"');
+	$replace=array("\\\\","\\0","\\n","\\r","\Z","\'",'\"');
+	return str_replace($search,$replace,$str);
+}
+
+/**
+* PDO　quote代用関数
+* [備考]
+* 文字列項目に値をセットする場合に使用
+* 型による自動処理は無いため、利用に注意
+* 
+* @param string $str 変換前文字列
+* @return string 変換後文字列
+*/
+function quote($str){
+	return "'".SI($str)."'";
+}
+/**
+ * Cookieを分割して配列化
+ * [備考]
+ *  書式：Cookie名=項目名:設定値,項目名:設定値,項目名:設定値,・・・ 
+ * @param	string	$cName	Cookie名
+ * @return	array			配列化したCookieデータ
+ */
+function splitCookie($cName) {
+	$arCookies = explode(',', $_COOKIE[$cName]);
+	for ($i = 0; $i < count($arCookies); $i++) {
+		$arCookie[] = explode(':', $arCookies[$i]);
+	}
+	return $arCookie;
+}
+/**
+ * 
+ * カラムサイズの再設定
+ * @param	Json	$JsonColumn	Json['Column']データ
+ * @param	array	$arColumn	gridのfield名の配列
+ * @param	string	$cName		Cookie名
+ * @return	Json				再設定後のJson['Column']データ
+ */
+function setColumnSize($JsonColumn, $arColumn, $cName) {
+	if (array_key_exists($cName, $_COOKIE)) {
+		$arCookie = splitCookie($cName);
+		for ($i = 0; $i < count($arColumn); $i++) {
+			$JsonColumn[$i]['sizeOriginal'] = $JsonColumn[$i]['size'];
+			for ($j = 0; $j < count($arCookie); $j++) {
+				if ($JsonColumn[$i]['field'] == $arCookie[$j][0] && $arCookie[$j][1] != '') {
+					$JsonColumn[$i]['size'] = $arCookie[$j][1];
+				}
+			}
+		}
+	}
+	return $JsonColumn;
+}
+/**
+ * バッチ用ブラウザメッセージ表示関数
+ * 
+ * @param	str	$Msg	メッセージ
+ * @return	Non			
+ */
+function pre_echo($Msg) {
+	ob_start();
+	echo "<pre>";				
+	echo date("Y-m-d H:i:s", $_SERVER['REQUEST_TIME']).":".$Msg;
+	echo "</pre>";
+	@flush();
+	( ob_get_level() > 0 )?ob_flush():null;
+	sleep(1);
+	
+}
+
+/**
+ * 配列要素確認
+ * 
+ * @param	array	$array	配列
+ * @param	str		$key	キー
+ * @return	str			
+ */
+function AKE($array,$key) {
+	return is_array($array)?(array_key_exists($key,$array)?$array[$key]:''):'';
+}
+
+/**
+ * 除算警告
+ * 
+ * @param	Num		$num1	分子
+ * @param	Num		$num2	分母
+ * @return	演算結果			
+ */
+function D($num1,$num2) {
+	return (($num1!=0 && $num2!=0)?($num1/$num2):0);
+}
+
+/**
+ * ログインカウント
+ * dbs環境の顧客情報にログインカウントを保存する。
+ * 
+ * @param	str		$key	フォルダ名
+ * @return	なし			
+ */
+function LoginCount($key) {
+	
+	//PDO接続
+	$pdo = null;
+	try {
+		$pdo = new PDO(
+			"mysql:host=localhost; dbname=rmdemo_dbs",
+			'rmdemo_dbsdemo',
+			'8WK4C5i7pG6XkmQ2',
+			array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . 'utf8'));
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	} catch (PDOException $e) {
+		exit;
+	}
+	$sql ="UPDATE M_BusinessCustomers A,M_BusinessCustomers B ";
+	$sql.="SET A.LoginCount=B.LoginCount+1,A.LoginDate=NOW() ";
+	$sql.="WHERE A.CustomerFolder='".$key."' AND B.CustomerFolder='".$key."' ";
+	
+	$pdo->beginTransaction();
+	try {
+		$stmt = $pdo->prepare($sql);
+		if (!$stmt->execute()) {
+			$addmessage = analyzePDOMessage($stmt->errorInfo());
+			if ($addmessage !== '') {
+				$ax = explode(',', $addmessage);
+				switch($ax[0]) {
+					case PDOERROR_KEYIDPRIMARY:
+						$ax[0] = IDXJ_PRIMARY;
+						break;
+					default:
+						$ax[0] = 'キー';
+				}
+				$addmessage = "\n\n(".$ax[0].$ax[1].')';
+			}
+			throw new Exception(EMSG_CANNOTUPDATERECORD.$addmessage);
+		}
+	} catch (Exception $ex) {
+		$pdo->rollback();
+		throw new Exception($ex->getMessage());
+	}
+	$pdo->commit();
+}
+
+/**
+ * trim the Number contain space and 0 from the beginning
+ * 
+ * 
+ * 
+ * @returns false if no Number			
+ */
+function trimNumber($value){
+    $result = false;	
+    $value = preg_replace('/\s/', '', $value);
+    if(is_numeric($value)){    
+	$value = str_split($value);
+	$count = count($value);
+	for($i=0;$i<$count;$i++){
+	    if($value[$i]=='0')$value[$i] = '';
+	    else break;
+	}
+	for($i=$count-1;$i>=0;$i--){
+	    if(preg_match('/\./', $value[$i])){
+		if($value[$i]=='0' || $value[$i]=='.')$value[$i] = '';		
+		else break;
+	    }  else break;
+	}
+	$result = implode($value);    
+	if(preg_match('/^\./', $result)) $result = '0'.$result;
+    }
+    return $result;
+}
+
+/**
+ * Get the last day of the month
+ * 
+ * 
+ * 
+ * @returns false if wrong date format	
+ */
+function getLastDay($year,$month){
+    $result = false;
+    $year = intval($year);
+    $month = intval($month);
+    if(is_int($year)&&is_int($month)&&$month>=1&&$month<=12){
+	$lastDay = array('','31','28','31','30','31','30','31','31','30','31','30','31');
+	if($year%4==0)$lastDay[2]='29';
+	$result = $lastDay[$month];	
+    }
+    return $result;
 }
 ?>

@@ -7,8 +7,8 @@ var popSiirePalam='';
 var rc='';
 var rs='';
 var MainCat='';
- var MainCatArray=[];
-  var SubCatArray=[];
+var MainCatArray=[];
+var SubCatArray=[];
 function session_checking(){ 
     var result = false;
 	$.ajax({
@@ -70,9 +70,10 @@ function getValueCombo(s){
    
     MainCatArray[0]=IdCate ;
     MainCatArray[1]=valueCat;
+    
     //alert(objSubCat);
     $("#combo1").show();
-   alert(objSubCat.id);
+   alert(MainCatArray[0]);
    w2ui.gExport.reload();
     // use ajax for to select Sub Category pass in combobox. 
    
@@ -88,8 +89,22 @@ function getValueSubCombo(s){
    
     SubCatArray[0]=IdCate ;
     SubCatArray[1]=valueCat;
-    alert(str);
-    
+   // alert(str);
+    var row={rows:[]};
+       row['rows'][0] = SubCatArray[0] ;
+    $.ajax({
+	url:'getdata_SubCategory.php',
+	dataType: 'json', 
+	type:'POST',
+	data:row,
+	async:false,
+	success:function(data){ 
+
+	    SubCat=data.records;
+	
+	}
+	
+    });
     // use ajax for to select Sub Category pass in combobox. 
    
     
@@ -162,7 +177,7 @@ var main={
 				      '</div>' 						    
 			    },	
 			    { type: 'break' },
-			    {type:'html',id:'MainCat',html:htmlMaincom},
+			    {type:'combo',id:'MainCat',html:htmlMaincom},
 			    { type: 'break' },
 			    {type:'html',id:'SubCate',html:htmlItemcom},
 			{ type: 'spacer' },
