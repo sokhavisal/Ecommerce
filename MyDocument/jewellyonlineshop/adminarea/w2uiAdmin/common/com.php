@@ -22,7 +22,7 @@ set_exception_handler( 'my_exception_handler' );
 * @return 
 */	
 function my_error_handler ( $errno, $errstr, $errfile, $errline, $errcontext ) {
-     error_log(date("Y-m-d H:i:s").":"."[$errno] $errstr $errfile($errline)\n", 3, __DIR__ .'/../logs/'.date("Ymd").'error.log');
+    // error_log(date("Y-m-d H:i:s").":"."[$errno] $errstr $errfile($errline)\n", 3, __DIR__ .'/../logs/'.date("Ymd").'error.log');
 }
 function my_exception_handler ( $e ) {
      error_log(date("Y-m-d H:i:s").":".$e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ")\n", __DIR__ .'/../logs/'.date("Ymd").'error.log');

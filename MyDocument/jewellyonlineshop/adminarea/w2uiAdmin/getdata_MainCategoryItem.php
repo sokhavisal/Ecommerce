@@ -1,14 +1,18 @@
 <?php
-    include ("../includes/mysqli_connection.php");
+     require_once __DIR__ .'/app/sys_const.php';
+  require_once __DIR__ .'/common/com.php';
     $ArrCat=array ();
     $sql='SELECT mmenu_id, mmenu_name FROM main_menu WHERE ItemCatMainStatus = 1 ';
-    $query=  mysqli_query($db_conx,$sql);
-$i=0;
-    while($row = mysqli_fetch_array($query, MYSQLI_ASSOC))
-    {
+    $query= SQLQuery($sql);
+$RowPos=0;
+    for  ($i=0;$i<count($query);$i++) 
+	
+		 {
+	$RowPos = $RowPos + 1;
+                $row=$query[$i];
 	$json['records']['id'][$i]=$row['mmenu_id'];
 	$json['records']['MainCat'][$i]=$row['mmenu_name'];
-	    $i++;
+	   
 	
     }
     //$ArrCat=[$id,$MainCat];

@@ -38,7 +38,7 @@ var objSubCat = getDataSubCategory('003');
 var htmlMaincom='';
 htmlMaincom+='<form  name=myform><label>Category Item : </label>';
 htmlMaincom+='<select id="my_select" onchange="getValueCombo(this)">';
-htmlMaincom+='<option name=one value=one id="0" selected >  </option>';
+htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
   for(var i=0;i<3;i++){
        htmlMaincom+='<option name=one value='+ obj.MainCat[i]+' id='+ obj.id[i]+' >'+ obj.MainCat[i]+' </option>';
     }
@@ -70,15 +70,8 @@ function getValueCombo(s){
    
     MainCatArray[0]=IdCate ;
     MainCatArray[1]=valueCat;
-    
-    //alert(objSubCat);
-    $("#combo1").show();
-   alert(MainCatArray[0]);
-   w2ui.gExport.reload();
-    // use ajax for to select Sub Category pass in combobox. 
-   
-    
-
+    w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
+    w2ui.gItemRanking.reload();
 
 return MainCatArray;
 }
@@ -177,7 +170,7 @@ var main={
 				      '</div>' 						    
 			    },	
 			    { type: 'break' },
-			    {type:'combo',id:'MainCat',html:htmlMaincom},
+			    {type:'html',id:'MainCat',html:htmlMaincom},
 			    { type: 'break' },
 			    {type:'html',id:'SubCate',html:htmlItemcom},
 			{ type: 'spacer' },
@@ -216,35 +209,136 @@ var main={
     ]
 };
 
+ var gItemRanking = {
+	grid: { 
+		name: 'gItemRanking',
+                style:pstyle,
+		header:'<font color="#FFF">PRODUCTS</font>',
+		//autoload:true,
+		url:'getdata_Items.php',
+		toolbar: {
+		    items: [
+			{ type: 'spacer', id: 'spacer'},
+			{ type: 'menu',   id: 'output', caption: '出力', img: 'icn-application-put', items: 
+                                                  [
+						      { id: 'outcsv',text: 'CSV', icon: 'icon-excel-csv' },
+                              { id: 'outxls',text: 'Excel', icon: 'icon-excel-xls' },                                                      
+						      { id: 'outxlsx',text: 'Excel2007', icon: 'icon-excel-xlsx' }
+						   ]
+                                               },
+					   
+					    { type: 'break',  id: 'break0' }
+		    ],
+		   
+	     },
+		
+		show: {
+	    footer:true,
+	    toolbar:true,
+	    toolbarReload:true,                     
+	    toolbarColumns:true,
+	    toolbarAdd:true,
+	    toolbarDelete:true,
+	    toolbarSave:true,
+	    toolbarEdit:true,
+	    header:true,
+	    toolbarSearch:true 
+			
+		},
+		multiSearch: true,
+		searchs:[{}],
+		columns: [{}],
 
-/*============== Grid==============*/
-var gExport={
-       name: 'gExport', 
-        header: 'Products ',
-        show: { header: true , footer: true,  toolbar     : true,  toolbarAdd: true,
-            toolbarDelete: true,
-            toolbarSave: true,
-            toolbarEdit: true},
-        columns: [                
-            { field: 'recid', caption: 'Code', size: '20', sortable: true, attr: 'align=center' },
-            { field: 'imagePath', caption: 'Item Type', size: '30%', sortable: true },
-	    { field: 'imagePath', caption: 'Category', size: '30%', sortable: true },
-	    { field: 'imagePath', caption: 'Item Name', size: '30%', sortable: true },
-	    { field: 'imagePath', caption: 'Item Price', size: '30%', sortable: true },
-	    { field: 'imagePath', caption: 'Images', size: '30%', sortable: true },
-	    { field: 'imagePath', caption: 'Description', size: '50%', sortable: true },
-	     { field: 'imagePath', caption: 'Path', size: '30%', sortable: true }
-	    
-        ]
+    
+	        onClick: function (event) {        
+                   
+		    
+		},
+		
+		onAdd: function (){
+			openPopup('Add Product',w2ui.layPopup,w2ui.fAddProduct,700,840);
+		}
+	}
+    };
+var layPopup = {
+    name: 'layPopup',
+    padding: 4,
+    panels: [
+        { type: 'main', minSize: 300, overflow: 'hidden' }
+    ]
 };
+
+
+
+//------------------------- ********** FORM W2UI ***********-----------------------------------------------------
+	var fAddProduct ={ 
+	    form : {
+		name:'fAddProduct',
+		formHTML: 
+		'<div id="frmWrapper" style=" float:left; width:400px; height:500px;background-color:#DDD; ">'+
+		
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px;  " type="text" name="txtboxcode" size="5" >'+
+		    '</div>'+
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+		    '</div>'+
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+		    '</div>'+
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+		    '</div>'+
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+		    '</div>'+
+		     '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:100px " type="text" name="txtboxcode" size="30">'+
+		    '</div>'+
+		     '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
+		    '</div>'+
+		    '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:15px;"> Item Code: </label>'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
+		    '</div>'+
+		   
+		' </div> '+
+		
+		'<div id="frmWrapper" style=" float:right; width:400px; height:500px;background-color:#DDD; ">'+
+		'</div>'+
+		
+		'<div class="w2ui-buttons">'+
+		'	<input class="btn btn-Green" type="button" value="Cancel" name="Cancel">'+
+		'	<input  class="btn-Save" type="button" value="Save" name="Save">'+
+		'</div>',
+	    fields: [
+		    { name: 'passwd', type: 'text', required: true },
+		    { name: 'repasswd', type: 'text', required: true }
+	    ],
+	}
+    };
+//------------------------- ********** END FORM ************-----------------------------------------------------
+
+
 
 
 $(document).ready(function(){
     w2utils.locale('ja-jp');
     $('#layout').w2layout(main);    
-    w2ui.layout.content('main',$().w2grid(gExport));
+    w2ui.layout.content('main',$().w2grid(gItemRanking.grid));
     w2ui.layout.load('top','header.php');    
     $("#combo1").hide();
+    
+    $().w2layout(layPopup);
+    $().w2form(fAddProduct.form);
     
     //$('input[type=list]').w2field('list', {options:{items:people}});
 });
@@ -328,3 +422,36 @@ function func_export(){
 function parseJSON(data) {
     return window.JSON && window.JSON.parse ? window.JSON.parse( data ) : (new Function("return " + data))(); 
 }
+
+//---------------------- ********* func_Open form ************--------------
+
+function openPopup(title,lobj,fobj,h,w) {
+	var winh=h || 400;
+	var winw=w || 600;
+	
+	w2popup.open({
+		title 	: title,
+		width	: winw,
+		height	: winh,
+		showMax : true,
+		body 	: '<div id="main" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"></div>',
+		onOpen  : function (event) {
+			event.onComplete = function () {
+				$('#w2ui-popup #main').w2render(lobj);
+				lobj.content('main', fobj);
+			};
+		},
+		onMax : function (event) { 
+			event.onComplete = function () {
+				//w2ui.mainf.resize();
+				//w2ui.frmContent.resize();
+			};
+		},
+		onMin : function (event) {
+			event.onComplete = function () {
+				//w2ui.mainf.resize();
+				//w2ui.frmContent.resize();
+			};
+		}
+	});
+};

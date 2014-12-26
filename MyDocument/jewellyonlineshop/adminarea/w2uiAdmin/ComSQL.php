@@ -1,5 +1,5 @@
 <?php
-    function func_getdataItems(){
+    function func_getdataItems($MainCate){
 	$sql="";
 //	$sql.=" SELECT M.mmenu_id AS MainCatID, S.id AS SubCatID , M.mmenu_name, S.smenu_name, M.ItemCatMainStatus, S.smenu_link ";
 //		$sql.= " , I.prodname, I.path, I.category, I.price , I.descr, I.type, I.noviews, I.topsell  ";
@@ -10,6 +10,7 @@
 //		$sql.= " LEFT JOIN jewellery ON S.id= I.category ";
 	$sql.=" SELECT ";
 	    $sql.=" I.id, ";
+	    $sql.=" I.itemCode, ";
 	    $sql.=" S.mmenu_id AS MainCategory, ";
 	    $sql.=" I.category, ";
 	    $sql.=" M.mmenu_name AS MainCategory, ";
@@ -26,7 +27,15 @@
 	     $sql.=" inner JOIN jewellery I ON ";
 	     $sql.=" I.category = S.id ";
 	     $sql.=" LEFT JOIN main_menu M ON ";
-	      $sql.=" M.mmenu_id= S.mmenu_id  ";
+	      $sql.=" M.mmenu_id= S.mmenu_id ";
+	      
+	      if($MainCate > 0  ){
+		   $sql.=" where M.mmenu_id = " . $MainCate ." Order by M.mmenu_id "  ;
+	      } else {
+		    $sql.=" Order by M.mmenu_id ";
+	      } 
+	    
+	    
 	return $sql;
 	
     }

@@ -71,7 +71,7 @@ else
 						
 						
 						// This sets the range of rows to query for
-						$limit = 'LIMIT 0,8';
+						$limit = 'LIMIT 0,12';
 						
 						// This is your query again, it is for grabbing just one page worth of rows by applying $limit
 						$sql = " SELECT * FROM jewellery WHERE topsell>0 ORDER BY topsell DESC $limit";

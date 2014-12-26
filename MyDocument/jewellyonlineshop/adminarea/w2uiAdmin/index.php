@@ -2,7 +2,7 @@
 
 <p align="center"><b>VIEW PRODUCTS RECORDS</b></p>
 
-<?php echo 'Hi, <strong> </strong> Good To See You Working! || <a href="logout.php"> Logout </a>'; ?>
+<?php echo 'Hi, <strong> </strong> Good To See You Working! || <a href="../../logout.php"> Logout </a>'; ?>
 
 <br />
 <div align="center">
