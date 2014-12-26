@@ -283,29 +283,29 @@ var layPopup = {
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="30">'+
+			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
 		    '</div>'+
-		     '<div style=" width:400px; height:50px;"> '+
+		     '<div style=" width:400px; height:120px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:100px " type="text" name="txtboxcode" size="30">'+
+			'<input style="float:left; margin:10px; height:100px " type="text" name="txtboxcode" size="35">'+
 		    '</div>'+
-		     '<div style=" width:400px; height:50px;"> '+
+		     '<div style=" width:400px; height:60px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
 			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
 		    '</div>'+
-		    '<div style=" width:400px; height:50px;"> '+
+		    '<div style=" width:400px; height:60px;"> '+
 			'<label style="float:left; margin:15px;"> Item Code: </label>'+
 			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
 		    '</div>'+
