@@ -47,7 +47,7 @@ $MainCat=X(filter_input(INPUT_GET, 'MainCat', FILTER_SANITIZE_STRING));
 				'type' => $row["type"],
 				'topsell' => $row["topsell"],
 				'noviews' => $row["noviews"],
-				'Image' => linkImage('http://localhost/SaleProduct/MyDocument/jewellyonlineshop/Photos/Diamond/Bangles/1.jpg ') ,
+				'Image' => linkImage('http://localhost/SaleProduct/MyDocument/jewellyonlineshop/Photos/48731_1.jpg ') ,
 				'nullRow' => ''
 
 			)

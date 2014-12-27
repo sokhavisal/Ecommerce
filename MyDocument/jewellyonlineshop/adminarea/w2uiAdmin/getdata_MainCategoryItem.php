@@ -10,9 +10,13 @@ $RowPos=0;
 		 {
 	$RowPos = $RowPos + 1;
                 $row=$query[$i];
-	$json['records']['id'][$i]=$row['mmenu_id'];
-	$json['records']['MainCat'][$i]=$row['mmenu_name'];
-	   
+//	$json['records']['id'][$i]=$row['mmenu_id'];
+//	$json['records']['MainCat'][$i]=$row['mmenu_id'];
+	 $json['records'][]=(array(
+		'id'=>$row["mmenu_id"],
+		'MainCat'=>$row["mmenu_name"]
+	    )
+	    );
 	
     }
     //$ArrCat=[$id,$MainCat];

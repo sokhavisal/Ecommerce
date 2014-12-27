@@ -40,7 +40,7 @@ htmlMaincom+='<form  name=myform><label>Category Item : </label>';
 htmlMaincom+='<select id="my_select" onchange="getValueCombo(this)">';
 htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
   for(var i=0;i<3;i++){
-       htmlMaincom+='<option name=one value='+ obj.MainCat[i]+' id='+ obj.id[i]+' >'+ obj.MainCat[i]+' </option>';
+       htmlMaincom+='<option name=one value='+ obj['id'][i]+' id='+ obj['id'][i]+' >'+ obj['MainCat'][i]+' </option>';
     }
 htmlMaincom+='</select>';
 htmlMaincom+='</form>';
@@ -214,7 +214,6 @@ var main={
 		name: 'gItemRanking',
                 style:pstyle,
 		header:'<font color="#FFF">PRODUCTS</font>',
-		//autoload:true,
 		url:'getdata_Items.php',
 		toolbar: {
 		    items: [
@@ -256,7 +255,8 @@ var main={
 		},
 		
 		onAdd: function (){
-			openPopup('Add Product',w2ui.layPopup,w2ui.fAddProduct,700,840);
+		   //w2ui.gItemRanking.select(1);
+		openPopup('Add Product',w2ui.layPopup,w2ui.fAddProduct,700,1000);
 		}
 	}
     };
@@ -269,60 +269,102 @@ var layPopup = {
 };
 
 
-
+var MainCat=getDataMainCategory();
 //------------------------- ********** FORM W2UI ***********-----------------------------------------------------
 	var fAddProduct ={ 
 	    form : {
 		name:'fAddProduct',
 		formHTML: 
-		'<div id="frmWrapper" style=" float:left; width:400px; height:500px;background-color:#DDD; ">'+
+			
+			
+	' <div class="w2ui-page page-0">'+
+
+
+		
+		'<div id="frmWrapper" style=" float:left; width:400px; height:500px;background-color:#FFF; ">'+
 		
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px;  " type="text" name="txtboxcode" size="5" >'+
+			'<label style="float:left; margin:5px;"> Item Code: </label>'+
+			'<input  style=" font-size:12px; float:left; margin:0px 0px 0px 40px;  " type="text" name="txtboxcode" size="15" placeholder="ex.GD001......." >'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
+			'<label style="float:left; margin:5px;"> Main Category: </label>'+
+			'<input id="comMainCat" style="float:left; margin: 0px 0px 0px 10px; height:30px " type="text" name="comMainCat" size="33" placeholder="ex:Diamond,Gold,Silver....">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
+			'<label style="float:left; margin:5px;"> Sub Category: </label>'+
+			'<input style="float:left; margin: 0px 0px 0px 15px ; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex:Ring,Ear.......">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
+			'<label style="float:left; margin:5px;"> Item Name: </label>'+
+			'<input style="float:left; margin:0px 0px 0px 30px; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex:DiaRing DR001.......">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="35">'+
+			'<label style="float:left; margin:5px;"> Price: </label>'+
+			'<input style="float:left; margin: 0px 0px 0px 65px ; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex: 1000$">'+
 		    '</div>'+
-		     '<div style=" width:400px; height:120px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:100px " type="text" name="txtboxcode" size="35">'+
+		     '<div style=" width:400px; height:150px;"> '+
+			'<label style="float:left; margin:5px;"> Description: </label>'+
+			'<textarea style="float:left; margin: 0px 0px 0px 30px; height:130px; width:290px; resize:none;" type="text" name="txtboxcode" size="50" placeholder="ex:Discount 10% ......."></textarea>'+
 		    '</div>'+
-		     '<div style=" width:400px; height:60px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
+		     '<div style=" width:400px; height:50px;"> '+
+			'<label style="float:left; margin:5px;"> Image: </label>'+
+			'<textarea style="float:left; resize:none; margin:0px 0px 0px 60px; height:40px; width:280px" type="text" name="txtboxcode" size="35" placeholder="ex:wwww.jewelly.com/admin/photos/Diamond001.jpg"></textarea>'+
 		    '</div>'+
 		    '<div style=" width:400px; height:60px;"> '+
-			'<label style="float:left; margin:15px;"> Item Code: </label>'+
-			'<input style="float:left; margin:10px; height:30px " type="text" name="txtboxcode" size="10">'+
+			'<label style="float:left; margin:5px;"> Type: </label>'+
+			'<input style="float:left; margin: 0px 0px 0px 70px ; height:30px " type="text" name="txtboxcode" size="15" placeholder="ex:Feature, last , soon .......">'+
 		    '</div>'+
 		   
 		' </div> '+
+	
+		'<div id="frmWrapper" style=" float:right; width:555px; height:500px;background-color:#FFF; ">'+
 		
-		'<div id="frmWrapper" style=" float:right; width:400px; height:500px;background-color:#DDD; ">'+
+		    '<div id="tilte" style=" text-align:center;float:left; width:400px; height:30px; margin:10px ;" >'+
+			'<h3 style="color:#0099cc">PRODUCTS DETAIL </h3>'+
+		    '</div>'+
+		    
+		    '<div id="Detail"style=" float:left; margin:5px; width:220px; height:460px;background-color:#f7f7f7; " >'+
+			'<center><h4 style="color:#088da5; margin:5px;">Detail</label></h4>'+
+			'<textarea style="float:left; margin:5px 0px 0px 5px; height:420px; width:210px; resize:none;" type="text" name="txtboxcode" size="50" placeholder="ex:Discount 10% ......."></textarea>'+
+		    '</div>'+
+		    '<div id="Detail"style=" float:right; margin:5px; width:310px; height:460px;background-color:#f7f7f7; " >'+
+			'<center><h4 style="color:#088da5; margin:5px;">Image</label></h4>'+
+			'<div style="float:right; margin:5px;">'+
+			 '<form action="upload.php" method="post" enctype="multipart/form-data" name="formPreview1" id="formPreview1">'+
+			 '<img src="" alt="Image Here" height="130" width="130" border="0" id="preview1" src="#" > ' +
+			 '<input type="file" name="datafile" size="2">' +
+			 '</form>'+
+			 '</div>'+
+			 
+			
+		    '</div>'+
+		    
 		'</div>'+
 		
-		'<div class="w2ui-buttons">'+
-		'	<input class="btn btn-Green" type="button" value="Cancel" name="Cancel">'+
-		'	<input  class="btn-Save" type="button" value="Save" name="Save">'+
+		'<div style="clear:both;"></div>'+
+		
+		'<div style="width:964px; height:50px; background-color:#FFF; margin:10px 0px 0px 0px ; ">'+
+		   '<center ><input type="button" style="margin:10px;" value="Cancel" name="Cancel"><input type="button" value="Save" name="Save"></center>'+
+		
+		'</div>'+
+		
 		'</div>',
+		
+		
 	    fields: [
 		    { name: 'passwd', type: 'text', required: true },
-		    { name: 'repasswd', type: 'text', required: true }
+		    { name: 'repasswd', type: 'text', required: true },
+		    { name: 'comMainCat', type: 'list', required: true,options:{items: MainCat.MainCat}}
 	    ],
+	     actions: {
+		    Cancel: function(){
+			var row ={rows:[]}; 
+                   row['rows'][0] = this.record;
+                   row['rows'][1] = $('#comMainCat').data('selected');
+			alert(  row['rows'][1].id);
+		    }
+	    }
 	}
     };
 //------------------------- ********** END FORM ************-----------------------------------------------------
@@ -339,6 +381,7 @@ $(document).ready(function(){
     
     $().w2layout(layPopup);
     $().w2form(fAddProduct.form);
+    
     
     //$('input[type=list]').w2field('list', {options:{items:people}});
 });
