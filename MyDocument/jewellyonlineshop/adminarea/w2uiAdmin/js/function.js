@@ -9,6 +9,13 @@ var rs='';
 var MainCat='';
 var MainCatArray=[];
 var SubCatArray=[];
+var htmlMaincom='';
+var SubCat;
+var obj = getDataMainCategory();
+
+
+
+//--------------------*************** block Function *******************---------------------------------------
 function session_checking(){ 
     var result = false;
 	$.ajax({
@@ -28,53 +35,30 @@ function session_checking(){
 	return result;     
 } 
 
-var obj = getDataMainCategory();
 
-
-
-
-var objSubCat = getDataSubCategory('003');
-// variable for create MainCategory combobox in toolbar. 
-var htmlMaincom='';
-htmlMaincom+='<form  name=myform><label>Category Item : </label>';
-htmlMaincom+='<select id="my_select" onchange="getValueCombo(this)">';
-htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
-  for(var i=0;i<3;i++){
-       htmlMaincom+='<option name=one value='+ obj['id'][i]+' id='+ obj['id'][i]+' >'+ obj['MainCat'][i]+' </option>';
+function countobj(obj){
+    var count = 0;
+    for (var k in obj) {
+	if (obj.hasOwnProperty(k)) {
+	   ++count;
+	}
     }
-htmlMaincom+='</select>';
-htmlMaincom+='</form>';
-
-
-var htmlItemcom='';
-htmlItemcom+='<form id="combo1" name=myform><label> Item Type : </label>';
-htmlItemcom+='<select id="my_select" onchange="getValueSubCombo(this)">';
-htmlItemcom+='<option name=one value=one id="0" selected >  </option>';
-//if(typeof  MainCatArray[0]=='undefined'){
-//   htmlItemcom+='<option name=one value="1" id="2" > dfsdsf    </option>';
-// }else{
-    
-      for(var i=0;i<10;i++){
-       htmlItemcom+='<option name=one value='+objSubCat.id[i]+' id='+objSubCat.id[i]+' >'+objSubCat.SubCatName[i]+' </option>';
-     }
-// }
-htmlItemcom+='</select>';
-htmlItemcom+='</form>';
-
-
-
+    return count;
+}
 
 function getValueCombo(s){
     var valueCat=(s[s.selectedIndex].value); // get value
     var IdCate=(s[s.selectedIndex].id);
-   
-    MainCatArray[0]=IdCate ;
-    MainCatArray[1]=valueCat;
-    w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
-    w2ui.gItemRanking.reload();
+	
+	MainCatArray[0]=IdCate ;
+	MainCatArray[1]=valueCat;
 
+	w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
+	w2ui.gItemRanking.reload();
+	alert(MainCatArray[0]);
 return MainCatArray;
 }
+
 
 function getValueSubCombo(s){
     var valueCat=(s[s.selectedIndex].value); // get value
@@ -98,53 +82,126 @@ function getValueSubCombo(s){
 	}
 	
     });
-    // use ajax for to select Sub Category pass in combobox. 
-   
-    
-//w2ui.gExport.lock('Loading..',true);
+
 return SubCatArray;
 }
 
-
-function getDataSubCategory(param){
- // MainCatID= MainCatID;
-     var SubCat ;
-	var row={rows:[]};
-       row['rows'][0] = param ;
-    $.ajax({
-	url:'getdata_SubCategory.php',
-	dataType: 'json', 
-	type:'POST',
-	data:row,
-	async:false,
-	success:function(data){ 
-
-	    SubCat=data.records;
-	
-	}
-	
-    });
-    return SubCat;
-}
-
 function getDataMainCategory(){
-      var MainCat ;
-       //row['rows'][0] =  '1';
-    $.ajax({
-	url:'getdata_MainCategoryItem.php',
-	dataType: 'json', 
-	type:'POST',
-	//data:row,
-	async:false,
-	success:function(data){ 
+	var MainCat ;
+	$.ajax({
+	    url:'getdata_MainCategoryItem.php',
+	    dataType: 'json', 
+	    type:'POST',
+	    //data:row,
+	    async:false,
+	    success:function(data){ 
 
-	    MainCat=data.records;
-	
-	}
-	
-    }); 
-    return MainCat;
+		MainCat= data.records;
+	    }
+
+	}); 
+
+	return MainCat;
 }
+
+
+function getvalueCombo(s){
+    var valueCat=(s[s.selectedIndex].value); // get value
+    var IdCate=(s[s.selectedIndex].id);
+    alert(IdCate);
+    return IdCate;
+}
+
+function readURL(input) {
+if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+        $('#preview').attr('src', e.target.result);
+	recordChanged=true;
+       }
+        reader.readAsDataURL(input.files[0]);
+       }
+
+}
+
+function readURLp1(input) {
+    if (input.files && input.files[0]) { 
+	    var reader = new FileReader();
+	    reader.onload = function (e) {
+		$('#preview1').attr('src', e.target.result);
+		document.getElementById("fileName1").value=input.files[0]['name']; 
+		recordChanged=true;
+	   }
+	    reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function uploadAjax(id,FileName){ 
+    _file = document.getElementById(id);
+    if(_file.files.length === 0){
+        return false;
+    }
+    var fileUpload = new FormData();
+    fileUpload.append('SelectedFile', _file.files[0]);
+    var fileName=[];
+   
+    $.ajax({
+	url: "upload.php?f="+FileName, // Url to which the request is send
+	type: "POST",             // Type of request to be send, called as method
+	data: fileUpload, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+	contentType: false,       // The content type used when sending data to the server.
+	cache: false,             // To unable request pages to be cached
+	processData:false,        // To send DOMDocument or non processed data file it is set to false
+	async:false,
+	success: function(data)   // A function to be called if request succeeds
+	{
+	  fileName=  data;
+	  alert(data);
+	}
+	});
+	return fileName;
+     
+}
+//--------------------*************** End block Function *******************---------------------------------------
+
+
+
+
+// variable for create MainCategory combobox in toolbar. 
+
+    htmlMaincom+='<form  name=myform><label>Category Item : </label>';
+    htmlMaincom+='<select id="my_select" name="MainCat" onchange="getValueCombo(this);">';
+    htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
+    //htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
+  for(var i=0;i<countobj(obj.id);i++){
+     htmlMaincom+='<option name=one value='+ obj.id[i]+' id='+ obj.id[i]+' >'+obj.MainCat[i]+' </option>';
+    }
+    htmlMaincom+='</select>';
+    htmlMaincom+='</form>';
+
+
+//var htmlItemcom='';
+//htmlItemcom+='<form id="combo1" name=myform><label> Item Type : </label>';
+//htmlItemcom+='<select id="my_select" onchange="getDataMainCategory();">';
+//htmlItemcom+='<option name=one value=one id="0" selected >  </option>';
+////if(typeof  MainCatArray[0]=='undefined'){
+////   htmlItemcom+='<option name=one value="1" id="2" > dfsdsf    </option>';
+//// }else{
+//    
+//      for(var i=0;i<10;i++){
+//      // htmlItemcom+='<option name=one value='+objSubCat.id[i]+' id='+objSubCat.id[i]+' >'+objSubCat.SubCatName[i]+' </option>';
+//     }
+//// }
+//htmlItemcom+='</select>';
+//htmlItemcom+='</form>';
+
+
+
+
+
+
+
+
 
 
 var main={
@@ -172,38 +229,50 @@ var main={
 			    { type: 'break' },
 			    {type:'html',id:'MainCat',html:htmlMaincom},
 			    { type: 'break' },
-			    {type:'html',id:'SubCate',html:htmlItemcom},
+			   //{type:'html',id:'SubCate',html:htmlItemcom},
 			{ type: 'spacer' },
 			{ type: 'button',  id: 'logout', caption: 'ログアウト', icon:'icn-door-in' }   
 		    ],
             onClick: function (event) {
-		    //セッション確認
-		    if(!session_checking()){
-			switch (event.target) {
-			    //Case log out application
-			    case 'logout':	
-				 w2ext.confirm(confirmLogout, function(btn) {
-				    if (btn === w2ext.buttons.Yes) { document.location = '../logout.php'; }
-				});					                                                               					
-				break;
-			    case 'backHome':										   
-				document.location = '../PortalMain.php';						             				    
-				break;	
-			    case 'Cat_Import':					   
-				    func_import();
-				    break;
-				case 'Data_Output':
-				    if(w2ui.gExport.records.length > 0){
-					func_export();
-				    }else{
-					w2ext.alertIcon = w2ext.icons.exclamation;                  
-					w2ext.alert("データを出力する前に\nファイルをインポートしてください。");
-				    }
-				break
-			    default:
-				    this.owner.content('main','開発中');
-			}
-		    }
+		var list;
+		  $.ajax({
+	url:'getdata_MainCategoryItem.php',
+	dataType: 'json', 
+	type:'POST',
+	//data:row,
+	sync:false,
+	success:function(data){
+	   list=data.records;
+	   
+	}
+	
+    });
+//		    if(!session_checking()){
+//			switch (event.target) {
+//			    //Case log out application
+//			    case 'logout':	
+//				 w2ext.confirm(confirmLogout, function(btn) {
+//				    if (btn === w2ext.buttons.Yes) { document.location = '../logout.php'; }
+//				});					                                                               					
+//				break;
+//			    case 'backHome':										   
+//				document.location = '../PortalMain.php';						             				    
+//				break;	
+//			    case 'Cat_Import':					   
+//				    func_import();
+//				    break;
+//				case 'Data_Output':
+//				    if(w2ui.gExport.records.length > 0){
+//					func_export();
+//				    }else{
+//					w2ext.alertIcon = w2ext.icons.exclamation;                  
+//					w2ext.alert("データを出力する前に\nファイルをインポートしてください。");
+//				    }
+//				break
+//			    default:
+//				    this.owner.content('main','開発中');
+//			}
+//		    }
 		}
             }},                
     ]
@@ -285,19 +354,20 @@ var MainCat=getDataMainCategory();
 		
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Item Code: </label>'+
-			'<input  style=" font-size:12px; float:left; margin:0px 0px 0px 40px;  " type="text" name="txtboxcode" size="15" placeholder="ex.GD001......." >'+
+			'<input  style=" font-size:12px; float:left; margin:0px 0px 0px 40px;  " type="text" name="itemcode" size="15" placeholder="ex.GD001......." >'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:5px;"> Main Category: </label>'+
-			'<input id="comMainCat" style="float:left; margin: 0px 0px 0px 10px; height:30px " type="text" name="comMainCat" size="33" placeholder="ex:Diamond,Gold,Silver....">'+
+			//'<label style="float:left; margin:5px;"> Main Category: </label>'+
+			htmlMaincom +
+			//'<input id="comMainCat" style="float:left; margin: 0px 0px 0px 10px; height:30px " type="text" name="comMainCat" size="33" placeholder="ex:Diamond,Gold,Silver...." onchange="getvalueCombo(this);">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Sub Category: </label>'+
-			'<input style="float:left; margin: 0px 0px 0px 15px ; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex:Ring,Ear.......">'+
+			'<input style="float:left; margin: 0px 0px 0px 10px ; height:30px " type="list"  id="SubCat" name="SubCat" size="35" placeholder="ex:Ring,Ear.......">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Item Name: </label>'+
-			'<input style="float:left; margin:0px 0px 0px 30px; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex:DiaRing DR001.......">'+
+			'<input style="float:left; margin:0px 0px 0px 30px; height:30px " type="text"  id="itemname" name="itemname" size="35" placeholder="ex:DiaRing DR001.......">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Price: </label>'+
@@ -330,10 +400,21 @@ var MainCat=getDataMainCategory();
 		    '</div>'+
 		    '<div id="Detail"style=" float:right; margin:5px; width:310px; height:460px;background-color:#f7f7f7; " >'+
 			'<center><h4 style="color:#088da5; margin:5px;">Image</label></h4>'+
-			'<div style="float:right; margin:5px;">'+
+			
+                '	    <div style="width:235px;height:150px;border:1px solid #CCCCCC;padding:0px;">'+               
+		'		 <input name="image" type="text" maxlength="2" style="width: 235px; display:none; " readonly>'+
+		'		 <img alt="Image Display Here" width="235px" height="150px" id="preview1" src="#" />'+
+		'	    </div>'+
+			    '<div>'+                
+		'		<input name="fileName1" id="fileName1" type="text" style="width: 150px; " readonly >'+
+		'		<button class="btn btn-green" name="browse" onclick="filePreview1.click();" >Browse</button>'+
+                '	    </div>'+
+			'<div style="float:right; display:none; margin:5px;">'+
+			    
 			 '<form action="upload.php" method="post" enctype="multipart/form-data" name="formPreview1" id="formPreview1">'+
-			 '<img src="" alt="Image Here" height="130" width="130" border="0" id="preview1" src="#" > ' +
-			 '<input type="file" name="datafile" size="2">' +
+			 //'<img src="" alt="Image Here" height="130" width="130" border="0" id="preview1" src="#" > ' +
+			   ' <input onchange="readURLp1(this);" type="file" name="filePreview1" id="filePreview1" accept="image/*" /> '+
+			// '<input type="file" name="datafile" size="0">' +
 			 '</form>'+
 			 '</div>'+
 			 
@@ -342,28 +423,61 @@ var MainCat=getDataMainCategory();
 		    
 		'</div>'+
 		
-		'<div style="clear:both;"></div>'+
+		' <div style="clear:both;"></div>'+
 		
+                
 		'<div style="width:964px; height:50px; background-color:#FFF; margin:10px 0px 0px 0px ; ">'+
-		   '<center ><input type="button" style="margin:10px;" value="Cancel" name="Cancel"><input type="button" value="Save" name="Save"></center>'+
-		
+//		   '<center ><input type="button" class="btn btn-blue" style="margin:10px;" value="Cancel" name="Cancel"><input class="btn btn-blue" type="button" value="Save" name="Save"></center>'+
+		//'<div class="w2ui-buttons">'+
+		    '<center >'+
+                    '<button  style="margin:10px;" class="btn btn-blue" name="reset">Reset</button>'+
+                    '<button  style="margin:10px;" class="btn btn-blue" name="save">Save</button>'+
+		    '</center>'+
+		    '</div>'+
 		'</div>'+
-		
 		'</div>',
 		
 		
 	    fields: [
-		    { name: 'passwd', type: 'text', required: true },
-		    { name: 'repasswd', type: 'text', required: true },
-		    { name: 'comMainCat', type: 'list', required: true,options:{items: MainCat.MainCat}}
+		     { name: 'itemcode', type: 'text', required: true },
+		     { name: 'itemname', type: 'text', required: true },
+		     { name: 'subcategory', type: 'text', required: true },
+		    { name: 'MainCat', type: 'list', required: true,options:{items: obj.MainCat}},
+		    { name: 'SubCat', type: 'list', required: true,options:{items: SubCat}},
+		    
+		     { name: 'image', type: 'text',  html: { caption: 'logo', attr: 'size="50" ' } },
+		    
 	    ],
 	     actions: {
-		    Cancel: function(){
+		    onLoad: function (){
+			    $('#itemname').load('sfsdf');
+			    
+		    },
+		    
+		    reset: function(event){
 			var row ={rows:[]}; 
                    row['rows'][0] = this.record;
-                   row['rows'][1] = $('#comMainCat').data('selected');
-			alert(  row['rows'][1].id);
-		    }
+                   row['rows'][1] = $('#my_select').data('selected');
+		   var changes = w2ui['fAddProduct'].record();
+		   SubCat=obj.MainCat;
+		   $('#SubCat').refresh();
+		alert();
+		    },
+		     save: function () {
+		    var fileUpload =uploadAjax('filePreview1','Pro'+w2ui['fAddProduct'].record['itemname']);
+		    alert(fileUpload);
+			if (fileUpload !==false){
+			    if (fileUpload.status=='error'){
+				 w2ext.alertIcon = w2ext.icons.error;
+				 w2ext.alert("Error Upload Logo: " + fileUpload.data);
+				 return;
+			    }else{
+				 w2ui['formMain'].record['Logo']=fileUpload.data;
+				 w2ui['formMain'].refresh();
+			    }
+			}
+			
+		     }
 	    }
 	}
     };

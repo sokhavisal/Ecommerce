@@ -149,8 +149,8 @@ else
 								}
 							}
 							$list = '';
-
-							$src = "Photos/";
+							    $src="Photos/";
+							//$src = "adminarea/w2uiAdmin/ProductImages/";
 								
 							if(!isset($_SESSION['username']))
 							{

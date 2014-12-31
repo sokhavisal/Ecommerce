@@ -10,15 +10,22 @@ $RowPos=0;
 		 {
 	$RowPos = $RowPos + 1;
                 $row=$query[$i];
-//	$json['records']['id'][$i]=$row['mmenu_id'];
-//	$json['records']['MainCat'][$i]=$row['mmenu_id'];
-	 $json['records'][]=(array(
+	$json['records']['id'][$i]=$row['mmenu_id'];
+	$json['records']['MainCat'][$i]=$row['mmenu_name'];
+	//$json['page']=0;
+//	 $json['records'][]=(array(
+//		$row["mmenu_id"],
+//		$row["mmenu_name"]
+//	    )
+//	    );
+	 $json['items']['item'.$RowPos][]=(
+	    array(
 		'id'=>$row["mmenu_id"],
-		'MainCat'=>$row["mmenu_name"]
+		'text'=>$row["mmenu_name"]
 	    )
-	    );
+	    ); 
 	
     }
     //$ArrCat=[$id,$MainCat];
-  echo json_encode($json);
+  echo json_encode($json) ;
 ?>
