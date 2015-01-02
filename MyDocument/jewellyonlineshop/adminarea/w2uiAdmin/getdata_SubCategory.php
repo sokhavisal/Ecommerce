@@ -14,7 +14,12 @@ $RowPos=0;
                 $row=$query[$i];
 		    $json['records']['id'][$i]=$row['id'];
 		    $json['records']['MainCatId'][$i]=$row['mmenu_id'];
-		    $json['records']['SubCatName'][$i]=$row['smenu_name'];
+		    if($i==0){
+			$json['records']['SubCatName'][$i]=" " ;
+		    }  else {
+			$json['records']['SubCatName'][$i]=$row['smenu_name'];
+		    }
+		   
 	
 	
 }

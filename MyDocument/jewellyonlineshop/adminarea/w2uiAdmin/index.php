@@ -28,6 +28,7 @@
 	  <script type="text/javascript"  src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
           <script type="text/javascript"  src="js/w2ui-1.4.2.min.js"></script>
           <script type= "text/javascript" src="js/function.js"></script>
+	  <script type= "text/javascript" src="js/w2ext.1.0.2.js"></script>
           <script type="text/javascript"  src="../js/w2com.js"></script>    
       <title> Rakuten Cabinet Image</title>
     </head>

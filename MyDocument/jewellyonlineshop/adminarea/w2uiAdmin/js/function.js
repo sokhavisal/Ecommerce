@@ -11,6 +11,7 @@ var MainCatArray=[];
 var SubCatArray=[];
 var htmlMaincom='';
 var SubCat;
+var htmlItemcom='';
 var obj = getDataMainCategory();
 
 
@@ -49,13 +50,54 @@ function countobj(obj){
 function getValueCombo(s){
     var valueCat=(s[s.selectedIndex].value); // get value
     var IdCate=(s[s.selectedIndex].id);
-	
+    var SubCat;
+    var row={rows:[]};
+    
 	MainCatArray[0]=IdCate ;
 	MainCatArray[1]=valueCat;
+	
+	row['rows'][0] = MainCatArray[0] ;
+	$.ajax({
+	url:'getdata_SubCategory.php',
+	dataType: 'json', 
+	type:'POST',
+	data:row,
+	async:false,
+	    success:function(data){ 
 
+
+		if ( data == null){
+		  
+		    MainCatArray[2] =" ";
+		    w2ui['fAddProduct'].record['fSubCat']=' ';
+		}else{
+
+		     SubCat=data.records;
+		     MainCatArray[2]=SubCat.SubCatName;
+		}
+
+
+	    }
+	
+	});
+   
+	var option = $('<option></option>').attr("value", "option value").text("Text");
+	$("#SubSelect").empty().append(option);
+
+	 var $el = $("#SubSelect");
+	$el.empty(); // remove old options
+	$.each(MainCatArray[2], function(value,key) {
+	    $el.append($("<option></option>")
+	    .attr("value", key).text(key));
+	});
+	
+	 w2ui['fAddProduct'].record['fMainCat']=MainCatArray[1];
+	//document.getElementById("fMainCat").value=MainCatArray[1];
 	w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
 	w2ui.gItemRanking.reload();
-	alert(MainCatArray[0]);
+	w2ui['fAddProduct'].record['fSubCat']=' ';
+	
+	//alert(MainCatArray[0]);
 return MainCatArray;
 }
 
@@ -66,23 +108,11 @@ function getValueSubCombo(s){
    
     SubCatArray[0]=IdCate ;
     SubCatArray[1]=valueCat;
-   // alert(str);
-    var row={rows:[]};
-       row['rows'][0] = SubCatArray[0] ;
-    $.ajax({
-	url:'getdata_SubCategory.php',
-	dataType: 'json', 
-	type:'POST',
-	data:row,
-	async:false,
-	success:function(data){ 
-
-	    SubCat=data.records;
-	
-	}
-	
-    });
-
+   // var SubCatId=SubCatArray.split(",");
+    //alert(SubCatArray[1]);
+    w2ui['fAddProduct'].record['fSubCat']=SubCatArray[1];
+   // document.getElementById("fSubCat").value=SubCatArray[1];
+       w2ui.fAddProduct.refresh();
 return SubCatArray;
 }
 
@@ -104,11 +134,30 @@ function getDataMainCategory(){
 	return MainCat;
 }
 
+//function getDataSubCategory(){
+//	var SubCat ;
+//	var row={rows:[]},
+//	$.ajax({
+//	    url:'getdata_SubCategory.php',
+//	    dataType: 'json', 
+//	    type:'POST',
+//	    data:row,
+//	    async:false,
+//	    success:function(data){ 
+//
+//		 SubCat=data.records;
+//	    }
+//
+//	}); 
+//
+//	return SubCat;
+//}
+
 
 function getvalueCombo(s){
     var valueCat=(s[s.selectedIndex].value); // get value
     var IdCate=(s[s.selectedIndex].id);
-    alert(IdCate);
+   // alert(IdCate);
     return IdCate;
 }
 
@@ -156,7 +205,7 @@ function uploadAjax(id,FileName){
 	success: function(data)   // A function to be called if request succeeds
 	{
 	  fileName=  data;
-	  alert(data);
+	  //(data);
 	}
 	});
 	return fileName;
@@ -170,30 +219,21 @@ function uploadAjax(id,FileName){
 // variable for create MainCategory combobox in toolbar. 
 
     htmlMaincom+='<form  name=myform><label>Category Item : </label>';
-    htmlMaincom+='<select id="my_select" name="MainCat" onchange="getValueCombo(this);">';
-    htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
-    //htmlMaincom+='<option name=one value=one id="0" selected > All Items </option>';
-  for(var i=0;i<countobj(obj.id);i++){
-     htmlMaincom+='<option name=one value='+ obj.id[i]+' id='+ obj.id[i]+' >'+obj.MainCat[i]+' </option>';
+    htmlMaincom+='<select style="margin: 0px 0px 0px 15px;" id="my_select" name="MainCat" onchange="getValueCombo(this);">';
+    htmlMaincom+='<option name=0000 value=0000 id="0" selected > All Items </option>';
+    for(var i=0;i<countobj(obj.id);i++){
+    htmlMaincom+='<option name='+obj.MainCat[i]+' value='+ obj.id[i]+' id='+ obj.id[i]+' >'+obj.MainCat[i]+' </option>';
     }
     htmlMaincom+='</select>';
     htmlMaincom+='</form>';
 
 
-//var htmlItemcom='';
-//htmlItemcom+='<form id="combo1" name=myform><label> Item Type : </label>';
-//htmlItemcom+='<select id="my_select" onchange="getDataMainCategory();">';
-//htmlItemcom+='<option name=one value=one id="0" selected >  </option>';
-////if(typeof  MainCatArray[0]=='undefined'){
-////   htmlItemcom+='<option name=one value="1" id="2" > dfsdsf    </option>';
-//// }else{
-//    
-//      for(var i=0;i<10;i++){
-//      // htmlItemcom+='<option name=one value='+objSubCat.id[i]+' id='+objSubCat.id[i]+' >'+objSubCat.SubCatName[i]+' </option>';
-//     }
-//// }
-//htmlItemcom+='</select>';
-//htmlItemcom+='</form>';
+
+    htmlItemcom+='<form id="combo1" name=myform><label> Item Type : </label>';
+    htmlItemcom+='<select style="margin: 0px 0px 0px 40px;" id="SubSelect" onchange="getValueSubCombo(this);">';
+    htmlItemcom+='<option name=0000 value=0000 id="0" selected >  </option>';
+    htmlItemcom+='</select>';
+    htmlItemcom+='</form>';
 
 
 
@@ -229,7 +269,7 @@ var main={
 			    { type: 'break' },
 			    {type:'html',id:'MainCat',html:htmlMaincom},
 			    { type: 'break' },
-			   //{type:'html',id:'SubCate',html:htmlItemcom},
+			  // {type:'html',id:'SubSelect',html:htmlItemcom},
 			{ type: 'spacer' },
 			{ type: 'button',  id: 'logout', caption: 'ログアウト', icon:'icn-door-in' }   
 		    ],
@@ -359,11 +399,14 @@ var MainCat=getDataMainCategory();
 		    '<div style=" width:400px; height:50px;"> '+
 			//'<label style="float:left; margin:5px;"> Main Category: </label>'+
 			htmlMaincom +
+			'<input style="float:left; display:none;  margin: 0px 0px 0px 10px ; height:30px " type="text"  id="fMainCat" name="fMainCat" size="10" placeholder="ex:Ring,Ear.......">'+
 			//'<input id="comMainCat" style="float:left; margin: 0px 0px 0px 10px; height:30px " type="text" name="comMainCat" size="33" placeholder="ex:Diamond,Gold,Silver...." onchange="getvalueCombo(this);">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:5px;"> Sub Category: </label>'+
-			'<input style="float:left; margin: 0px 0px 0px 10px ; height:30px " type="list"  id="SubCat" name="SubCat" size="35" placeholder="ex:Ring,Ear.......">'+
+			htmlItemcom +
+			'<input style="float:left;  display:none;  margin: 0px 0px 0px 10px ; height:30px " type="text"  id="fSubCat" name="fSubCat" size="10" placeholder="ex:Ring,Ear.......">'+
+			//'<label style="float:left; margin:5px;"> Sub Category: </label>'+
+			//'<input style="float:left; margin: 0px 0px 0px 10px ; height:30px " type="text"  id="SubCat" name="SubCat" size="35" placeholder="ex:Ring,Ear.......">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Item Name: </label>'+
@@ -371,19 +414,19 @@ var MainCat=getDataMainCategory();
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> Price: </label>'+
-			'<input style="float:left; margin: 0px 0px 0px 65px ; height:30px " type="text" name="txtboxcode" size="35" placeholder="ex: 1000$">'+
+			'<input style="float:left; margin: 0px 0px 0px 65px ; height:30px " type="text" name="itemprice" size="35" placeholder="ex: 1000$">'+
 		    '</div>'+
 		     '<div style=" width:400px; height:150px;"> '+
 			'<label style="float:left; margin:5px;"> Description: </label>'+
-			'<textarea style="float:left; margin: 0px 0px 0px 30px; height:130px; width:290px; resize:none;" type="text" name="txtboxcode" size="50" placeholder="ex:Discount 10% ......."></textarea>'+
+			'<textarea style="float:left; margin: 0px 0px 0px 30px; height:130px; width:290px; resize:none;" type="text" name="itemdescription" size="50" placeholder="ex:Discount 10% ......." required></textarea>'+
 		    '</div>'+
 		     '<div style=" width:400px; height:50px;"> '+
-			'<label style="float:left; margin:5px;"> Image: </label>'+
-			'<textarea style="float:left; resize:none; margin:0px 0px 0px 60px; height:40px; width:280px" type="text" name="txtboxcode" size="35" placeholder="ex:wwww.jewelly.com/admin/photos/Diamond001.jpg"></textarea>'+
+			'<label style="float:left; margin:5px;"> ImageURL: </label>'+
+			'<textarea style="float:left; resize:none; margin:0px 0px 0px 40px; height:40px; width:280px" type="text" name="itemimageurl" size="35" placeholder="ex:wwww.jewelly.com/admin/photos/Diamond001.jpg"></textarea>'+
 		    '</div>'+
 		    '<div style=" width:400px; height:60px;"> '+
 			'<label style="float:left; margin:5px;"> Type: </label>'+
-			'<input style="float:left; margin: 0px 0px 0px 70px ; height:30px " type="text" name="txtboxcode" size="15" placeholder="ex:Feature, last , soon .......">'+
+			'<input style="float:left; margin: 0px 0px 0px 70px ; height:30px " type="text" name="itemtype" size="15" placeholder="ex:Feature, last , soon .......">'+
 		    '</div>'+
 		   
 		' </div> '+
@@ -441,10 +484,14 @@ var MainCat=getDataMainCategory();
 	    fields: [
 		     { name: 'itemcode', type: 'text', required: true },
 		     { name: 'itemname', type: 'text', required: true },
-		     { name: 'subcategory', type: 'text', required: true },
-		    { name: 'MainCat', type: 'list', required: true,options:{items: obj.MainCat}},
-		    { name: 'SubCat', type: 'list', required: true,options:{items: SubCat}},
-		    
+		     { name: 'itemprice', type: 'text', required: true },
+		     { name: 'MainCat', type: 'text', required: true},
+		      { name: 'fMainCat', type: 'text', required: true},
+		     { name: 'SubSelect', type: 'text', required: true},
+		      { name: 'fSubCat', type: 'text', required: true},
+		     { name: 'itemdescription', type: 'text', required:true},
+		     { name: 'itemimageurl', type: 'text', required: true },
+		     { name: 'itemtype', type: 'text', required: true },
 		     { name: 'image', type: 'text',  html: { caption: 'logo', attr: 'size="50" ' } },
 		    
 	    ],
@@ -455,23 +502,31 @@ var MainCat=getDataMainCategory();
 		    },
 		    
 		    reset: function(event){
-			var row ={rows:[]}; 
-                   row['rows'][0] = this.record;
-                   row['rows'][1] = $('#my_select').data('selected');
-		   var changes = w2ui['fAddProduct'].record();
-		   SubCat=obj.MainCat;
-		   $('#SubCat').refresh();
-		alert();
+			var records= this.record;
+			//alert(records.fMainCat);
 		    },
-		     save: function () {
-		    var fileUpload =uploadAjax('filePreview1','Pro'+w2ui['fAddProduct'].record['itemname']);
-		    alert(fileUpload);
+		     save: function (event) {
+			 var records=this.record;
+			 var row={rows:[]};
+			 row['rows'][0]=records;
+			 $.ajax({
+			    url:'dbsMain.php?T=save&tbl=0',
+			    data:row,
+			    type:"POST",
+			    success:function (data){
+				alert(data);
+				
+			    }
+			 });
+			// alert(records.fSubCat);
+			var fileUpload =uploadAjax('filePreview1','Pro'+w2ui['fAddProduct'].record['itemname']);
 			if (fileUpload !==false){
 			    if (fileUpload.status=='error'){
 				 w2ext.alertIcon = w2ext.icons.error;
 				 w2ext.alert("Error Upload Logo: " + fileUpload.data);
 				 return;
 			    }else{
+				
 				 w2ui['formMain'].record['Logo']=fileUpload.data;
 				 w2ui['formMain'].refresh();
 			    }
