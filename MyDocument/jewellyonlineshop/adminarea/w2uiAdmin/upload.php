@@ -1,12 +1,16 @@
 <?php
 define ('SITE_ROOT', realpath(dirname(__FILE__)));
     require_once __DIR__ .'/app/sys_const.php';
-  require_once __DIR__ .'/common/com.php';
+    require_once __DIR__ .'/common/com.php';
 //$FileName=filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING);
-$FileName=X(filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING));
-$target_dir = "ProductImages/";
-$target_file = $target_dir . basename($_FILES["SelectedFile"]["name"]); 
-$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+	$FileName=X(filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING));
+	$Pathurl=X(filter_input(INPUT_GET, 'pathurl', FILTER_SANITIZE_STRING));
+	$subCategory=X(filter_input(INPUT_GET, 'SubCategory', FILTER_SANITIZE_STRING));
+
+
+	$target_dir = "ProductImages/".$Pathurl."/".$subCategory."/";
+	$target_file = $target_dir . basename($_FILES["SelectedFile"]["name"]); 
+	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
 
 
 // Output JSON

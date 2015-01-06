@@ -12,6 +12,10 @@ var SubCatArray=[];
 var htmlMaincom='';
 var SubCat;
 var htmlItemcom='';
+var msgitemRequire='Please fill Your information Product.';
+var msgitemaddcomplete='Add Product is successful.';
+var urlicom="";
+var classbtn="";
 var obj = getDataMainCategory();
 
 
@@ -80,9 +84,11 @@ function getValueCombo(s){
 	    }
 	
 	});
-   
-	var option = $('<option></option>').attr("value", "option value").text("Text");
-	$("#SubSelect").empty().append(option);
+	w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
+	w2ui.gItemRanking.reload();
+	
+//	var option = $('<option></option>').attr("value", "option value").text("Text");
+//	$("#SubSelect").empty().append(option);
 
 	 var $el = $("#SubSelect");
 	$el.empty(); // remove old options
@@ -90,12 +96,10 @@ function getValueCombo(s){
 	    $el.append($("<option></option>")
 	    .attr("value", key).text(key));
 	});
-	
-	 w2ui['fAddProduct'].record['fMainCat']=MainCatArray[1];
-	//document.getElementById("fMainCat").value=MainCatArray[1];
-	w2ui.gItemRanking.url='getdata_Items.php?MainCat='+ MainCatArray[0] ;
-	w2ui.gItemRanking.reload();
+	w2ui['fAddProduct'].record['fMainCat']=MainCatArray[0];
+	w2ui['fAddProduct'].record['fpathurl']=MainCatArray[1];
 	w2ui['fAddProduct'].record['fSubCat']=' ';
+	
 	
 	//alert(MainCatArray[0]);
 return MainCatArray;
@@ -185,7 +189,7 @@ function readURLp1(input) {
     }
 }
 
-function uploadAjax(id,FileName){ 
+function uploadAjax(id,FileName,pathurl,subCatfolder){ 
     _file = document.getElementById(id);
     if(_file.files.length === 0){
         return false;
@@ -195,7 +199,7 @@ function uploadAjax(id,FileName){
     var fileName=[];
    
     $.ajax({
-	url: "upload.php?f="+FileName, // Url to which the request is send
+	url: "upload.php?f="+FileName+"&pathurl="+pathurl+"&SubCategory="+subCatfolder, // Url to which the request is send
 	type: "POST",             // Type of request to be send, called as method
 	data: fileUpload, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
 	contentType: false,       // The content type used when sending data to the server.
@@ -211,6 +215,65 @@ function uploadAjax(id,FileName){
 	return fileName;
      
 }
+
+function AjaxUploadFolder(subfoldername,subCatfolder){
+    var con =true;
+    if(subfoldername =="" && subCatfolder=="" ){
+	con=false;
+    }else{
+	$.ajax({
+	url:'uploadfolder.php?MainCategory='+subfoldername+'&SubCategory='+subCatfolder,
+	type:"POST",
+	async:false,
+	success:function (data){
+	    if (data!=''){
+	    //alert(data);
+	    }
+	}
+	
+	
+    });
+    }
+    
+    return con;
+	
+}
+
+function func_geturl(){
+    var MainCat= w2ui['fAddProduct'].record['fpathurl'];
+    var SubCat= w2ui['fAddProduct'].record['fSubCat'];
+    var itemcode=w2ui['fAddProduct'].record['itemcode'];
+    var itemname= w2ui['fAddProduct'].record['itemname'];
+    w2ui['fAddProduct'].record['itemimageurl']=MainCat+"/"+SubCat+"/"+itemname+"_"+itemcode;
+   w2ui.fAddProduct.refresh();
+}
+
+function clearData(){
+    w2ui['fAddProduct'].record['itemcode']=undefined;
+    w2ui['fAddProduct'].record['itemname']=undefined;
+    w2ui['fAddProduct'].record['itemprice']='';
+    w2ui['fAddProduct'].record['itemdescription']='';
+     w2ui['fAddProduct'].record['itemimageurl']='';
+    w2ui['fAddProduct'].record['itemtype']='';
+     w2ui['fAddProduct'].record['fpathurl']='';
+     // w2ui['fAddProduct'].record['image']='';
+   // w2ui.fAddProduct.reload();
+    
+}
+
+   function showMessage (msg,btnName,urlicom,classbtn) {
+       btnName=btnName || 'OK' ;
+    w2popup.message({ 
+        width   : 450, 
+        height  : 200,
+        html    : '<div style="padding: 60px; text-align: center; font-size:13px; "><img src="'+urlicom+'" width="40px" height="40px"> ' + msg + ' </div>'+
+                  '<div style="text-align: center;" ><button class="'+classbtn+'" onclick="w2popup.message()">'+btnName+'</button>'
+    });
+    clearData();
+    w2ui.fAddProduct.refresh();
+    
+
+}
 //--------------------*************** End block Function *******************---------------------------------------
 
 
@@ -220,9 +283,9 @@ function uploadAjax(id,FileName){
 
     htmlMaincom+='<form  name=myform><label>Category Item : </label>';
     htmlMaincom+='<select style="margin: 0px 0px 0px 15px;" id="my_select" name="MainCat" onchange="getValueCombo(this);">';
-    htmlMaincom+='<option name=0000 value=0000 id="0" selected > All Items </option>';
+    htmlMaincom+='<option name=one value=AllItems id="0" selected > All Items </option>';
     for(var i=0;i<countobj(obj.id);i++){
-    htmlMaincom+='<option name='+obj.MainCat[i]+' value='+ obj.id[i]+' id='+ obj.id[i]+' >'+obj.MainCat[i]+' </option>';
+    htmlMaincom+='<option name='+obj.MainCat[i]+' value='+ obj.MainCat[i]+' id='+ obj.id[i]+' >'+obj.MainCat[i]+' </option>';
     }
     htmlMaincom+='</select>';
     htmlMaincom+='</form>';
@@ -322,6 +385,7 @@ var main={
 	grid: { 
 		name: 'gItemRanking',
                 style:pstyle,
+		fixedbody:true,
 		header:'<font color="#FFF">PRODUCTS</font>',
 		url:'getdata_Items.php',
 		toolbar: {
@@ -400,6 +464,7 @@ var MainCat=getDataMainCategory();
 			//'<label style="float:left; margin:5px;"> Main Category: </label>'+
 			htmlMaincom +
 			'<input style="float:left; display:none;  margin: 0px 0px 0px 10px ; height:30px " type="text"  id="fMainCat" name="fMainCat" size="10" placeholder="ex:Ring,Ear.......">'+
+			'<input style="float:left; display:none;  margin: 0px 0px 0px 10px ; height:30px " type="text"  id="fpathurl" name="fMainCat" size="10" placeholder="ex:Ring,Ear.......">'+
 			//'<input id="comMainCat" style="float:left; margin: 0px 0px 0px 10px; height:30px " type="text" name="comMainCat" size="33" placeholder="ex:Diamond,Gold,Silver...." onchange="getvalueCombo(this);">'+
 		    '</div>'+
 		    '<div style=" width:400px; height:50px;"> '+
@@ -418,11 +483,11 @@ var MainCat=getDataMainCategory();
 		    '</div>'+
 		     '<div style=" width:400px; height:150px;"> '+
 			'<label style="float:left; margin:5px;"> Description: </label>'+
-			'<textarea style="float:left; margin: 0px 0px 0px 30px; height:130px; width:290px; resize:none;" type="text" name="itemdescription" size="50" placeholder="ex:Discount 10% ......." required></textarea>'+
+			'<textarea style="float:left; margin: 0px 0px 0px 30px; height:130px; width:290px; resize:none;" type="text" name="itemdescription" size="50" placeholder="ex:Discount 10% ......." ></textarea>'+
 		    '</div>'+
 		     '<div style=" width:400px; height:50px;"> '+
 			'<label style="float:left; margin:5px;"> ImageURL: </label>'+
-			'<textarea style="float:left; resize:none; margin:0px 0px 0px 40px; height:40px; width:280px" type="text" name="itemimageurl" size="35" placeholder="ex:wwww.jewelly.com/admin/photos/Diamond001.jpg"></textarea>'+
+			'<textarea style="float:left; resize:none; margin:0px 0px 0px 40px; height:40px; width:280px" type="text" id="itemimageurl" name="itemimageurl" size="35" placeholder="ex:wwww.jewelly.com/admin/photos/Diamond001.jpg" onmousedown="func_geturl();"></textarea>'+
 		    '</div>'+
 		    '<div style=" width:400px; height:60px;"> '+
 			'<label style="float:left; margin:5px;"> Type: </label>'+
@@ -486,12 +551,15 @@ var MainCat=getDataMainCategory();
 		     { name: 'itemname', type: 'text', required: true },
 		     { name: 'itemprice', type: 'text', required: true },
 		     { name: 'MainCat', type: 'text', required: true},
-		      { name: 'fMainCat', type: 'text', required: true},
+		     { name: 'fMainCat', type: 'text', required: true},
+		     { name: 'fpathurl', type: 'text', required: true},
 		     { name: 'SubSelect', type: 'text', required: true},
-		      { name: 'fSubCat', type: 'text', required: true},
+		     { name: 'fSubCat', type: 'text', required: true},
 		     { name: 'itemdescription', type: 'text', required:true},
 		     { name: 'itemimageurl', type: 'text', required: true },
 		     { name: 'itemtype', type: 'text', required: true },
+		      { name: 'fileName1', type: 'text', required: true },
+		     
 		     { name: 'image', type: 'text',  html: { caption: 'logo', attr: 'size="50" ' } },
 		    
 	    ],
@@ -502,37 +570,62 @@ var MainCat=getDataMainCategory();
 		    },
 		    
 		    reset: function(event){
-			var records= this.record;
+			
+			//var records= this.record;
 			//alert(records.fMainCat);
+//			 w2ui['fAddProduct'].record['itemimageurl']="dfdf";
+//			 w2ui.fAddProduct.refresh();
 		    },
 		     save: function (event) {
+			// w2ui['fAddProduct'].lock("Loading...",true);
+			  //ini_set('max_execution_time', 60);
+			   
+			 var vpathurl;
 			 var records=this.record;
-			 var row={rows:[]};
-			 row['rows'][0]=records;
-			 $.ajax({
-			    url:'dbsMain.php?T=save&tbl=0',
-			    data:row,
-			    type:"POST",
-			    success:function (data){
-				alert(data);
-				
-			    }
-			 });
-			// alert(records.fSubCat);
-			var fileUpload =uploadAjax('filePreview1','Pro'+w2ui['fAddProduct'].record['itemname']);
-			if (fileUpload !==false){
-			    if (fileUpload.status=='error'){
-				 w2ext.alertIcon = w2ext.icons.error;
-				 w2ext.alert("Error Upload Logo: " + fileUpload.data);
-				 return;
-			    }else{
-				
-				 w2ui['formMain'].record['Logo']=fileUpload.data;
-				 w2ui['formMain'].refresh();
-			    }
-			}
+			 vpathurl=records.fpathurl;
+			 var subfolderupload=AjaxUploadFolder(vpathurl,records.fSubCat);
+			 //alert(records.itemcode);
+			 if(subfolderupload!=false && typeof records.itemcode !='undefined' && typeof records.itemname !='undefined' ){
+			  //showMessage(msgitemRequire);
+				var row={rows:[]};
+				row['rows'][0]=records;
+				$.ajax({
+				   url:'dbsMain.php?T=save&tbl=0',
+				   data:row,
+				   type:"POST",
+				   success:function (data){
+					
+				   }
+				});
+				var fileUpload =uploadAjax('filePreview1',w2ui['fAddProduct'].record['itemname']+"_"+records.itemcode,vpathurl,records.fSubCat);
+				    if (fileUpload !==false){
+					if (fileUpload.status=='error'){
+					     w2ext.alertIcon = w2ext.icons.error;
+					     w2ext.alert("Error Upload Logo: " + fileUpload.data);
+					     return;
+					}else{
+
+					     w2ui['fAddProduct'].record['Logo']=fileUpload.data;
+					    // w2ui['fAddProduct'].refresh();
+					     //clearData();
+					    // w2ui.gItemRanking.reload();
+					    // showMessage(msgitemaddcomplete);
+					}
+				    }
+					  
+					    w2ui.gItemRanking.reload();
+					    showMessage(msgitemaddcomplete,'OK',"image/comfirm.ico","btn btn-blue");
+					    
+					      
+			 }else{
+				showMessage(msgitemRequire,'OK',"image/exclamation-mark.gif","btn btn-red");
+			 }
 			
+			 //alert(vpathurl);
+			
+		    
 		     }
+		 
 	    }
 	}
     };
@@ -664,6 +757,13 @@ function openPopup(title,lobj,fobj,h,w) {
 				//w2ui.mainf.resize();
 				//w2ui.frmContent.resize();
 			};
+			
+		},
+		onClose : function (event){
+			//event.onComplete = function () {
+			  // w2ui.gItemRanking.reload();
+			//}
 		}
+		
 	});
 };

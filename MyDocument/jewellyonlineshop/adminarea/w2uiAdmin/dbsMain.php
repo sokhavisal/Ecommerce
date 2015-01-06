@@ -20,7 +20,7 @@
 			if($records['fSubCat']==" " || $records['fSubCat']=='undefined'){
 			    echo 'Please select Category Item First.';
 			}else {
-			    $sql=" SELECT id FROM sub_menu where  smenu_name =  '".$records['fSubCat']."' AND mmenu_id = "  .$records['MainCat'];
+			    $sql=" SELECT id FROM sub_menu where  smenu_name =  '".$records['fSubCat']."' AND mmenu_id = "  .$records['fMainCat'];
 			    $subCatId=SQLQuery($sql);
 			    
 			    $sql=" INSERT INTO jewellery SET itemCode='".$records['itemcode']."', prodname='".$records['itemname']."',path='".$records['itemimageurl']."',category='".$subCatId[0]['id']."',price='".$records['itemprice']."',descr='".$records['itemdescription']."',type='".$records['itemtype']."'";
